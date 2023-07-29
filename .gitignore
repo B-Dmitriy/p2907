@@ -1,0 +1,6 @@
+# development tools
+/.vscode
+
+# build
+/node_modules
+/dist
