@@ -1,38 +1,12 @@
-import express, {Request, Response} from 'express'
-import pgPromise, { IMain } from 'pg-promise'
+import express from 'express';
+import { todosRouter } from './routes/todosRouter';
 
-const app = express()
-const port = 3000
-const pgp = pgPromise()
-const db = pgp("postgres://postgres:postgres@localhost:5432/postgres")
+const app = express();
+const port = 3000;
 
-app.get('/', function (req: Request, res: Response) {
-  
-  db.any("SELECT * FROM todos")
-    .then(function (data) {
-        res.send(data);
-    })
-    .catch(function (error) {
-      res.send("Error: " + error);
-    });
-});
-
-app.post('/', function (req, res) {
-  res.send('Got a POST request');
-});
-
-
-app.put('/todos', function (req, res) {
-  res.send('Got a PUT request at /todos');
-});
-
-
-app.delete('/todos', function (req, res) {
-  res.send('Got a DELETE request at /todos');
-});
-
+app.use('/todos', todosRouter);
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Example app listening on port ${port}`);
+});
 
