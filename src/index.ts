@@ -4,6 +4,8 @@ import { todosRouter } from './routes/todosRouter';
 const app = express();
 const port = 3000;
 
+app.use(express.json());
+
 app.use('/todos', todosRouter);
 
 app.listen(port, () => {
