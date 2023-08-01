@@ -39,5 +39,5 @@ class ErrorHandler {
         }
     }
 }
-console.log("created");
+
 export const errorHandler = new ErrorHandler();
