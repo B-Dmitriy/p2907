@@ -1,8 +1,11 @@
 import express from 'express';
 import { todosRouter } from './routes/todosRouter';
+import 'dotenv/config';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 7000;
+
+app.use(express.json());
 
 app.use('/todos', todosRouter);
 
