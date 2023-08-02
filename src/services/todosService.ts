@@ -1,9 +1,6 @@
-import pgPromise from 'pg-promise';
+import { db } from '../config/database';
 import { ITodo } from '../models/todosModels';
 import { errorHandler } from '../utils/errorHandler';
-
-const pgp = pgPromise();
-const db = pgp("postgres://postgres:postgres@localhost:5432/postgres");
 
 class TodosService {
     async getTodos(): Promise<ITodo[] | Error> {
