@@ -13,3 +13,8 @@ export interface IPrivateUserData {
 }
 
 export interface IUser extends IPublicUserData, IPrivateUserData { }
+
+export interface IRequestUser {
+    id: string;
+    role: TRole;
+}

@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
+import { RequestAuth } from '../middlewares/authMiddleware';
 import { authService } from '../services/authService';
-import { errorHandler } from './../utils/errorHandler';
+import { errorHandler } from '../utils/errorHandler';
 
 class AuthController {
-    async me(req: Request, res: Response) {
+    async me(req: RequestAuth, res: Response) {
         try {
-            const token = req.body.token;
+            const id = req.user?.id || '';
 
-            const user = await authService.me(token);
+            const user = await authService.me(id);
 
             res.send(user);
         } catch (err: Error | unknown) {
@@ -27,17 +28,10 @@ class AuthController {
         }
     }
 
-    async logout(req: Request, res: Response) {
-        try {
-
-        } catch (err: Error | unknown) {
-            return errorHandler.notFound(res, err);
-        }
-    }
-
     async registration(req: Request, res: Response) {
         try {
             const userData = req.body;
+
             const user = await authService.registration(userData);
 
             res.send(user);
