@@ -3,9 +3,14 @@ import { ITodo } from '../models/todosModels';
 import { errorHandler } from '../utils/errorHandler';
 
 class TodosService {
-    async getTodos(): Promise<ITodo[] | Error> {
+    async getTodos(userId: string, limit: string, page: string): Promise<ITodo[] | Error> {
         try {
-            const data = await db.any("SELECT * FROM todos");
+            const offset = page === '1' ? 0 : (parseInt(page) * parseInt(limit) - parseInt(limit));
+
+            const data = await db.any(`SELECT * FROM todolist.todos 
+            WHERE user_id = $1 
+            LIMIT $2 
+            OFFSET $3`, [userId, limit, offset]);
 
             return data;
         } catch (err) {
@@ -14,11 +19,12 @@ class TodosService {
 
     }
 
-    async getTodoById(id: string): Promise<ITodo | Error> {
+    async getTodoById(userId: string, todoId: string): Promise<ITodo | Error> {
         try {
-            const data = await db.any("SELECT * FROM todos WHERE id=$1", id);
+            const data = await db.any(`SELECT * FROM todolist.todos 
+            WHERE user_id = $1 AND id=$2`, [userId, todoId]);
 
-            if (!data.length) throw "Todo with id: " + id + " not found";
+            if (!data.length) throw "Todo with id: " + todoId + " for user: " + userId + " not found";
 
             return data[0];
         } catch (err) {

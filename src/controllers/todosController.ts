@@ -2,10 +2,38 @@ import { Request, Response } from 'express';
 import { todosService } from '../services/todosService';
 import { errorHandler } from './../utils/errorHandler';
 
+const DEFAULT_LIMIT: string = '10';
+const DEFAULT_PAGE: string = '1';
+
 class TodoController {
-    async getTodos(req: Request, res: Response) {
+    async getTodos(req: Request<any, any, any, {
+        userId: string,
+        limit: string,
+        page: string,
+    }>, res: Response) {
+        const {
+            userId,
+            limit = DEFAULT_LIMIT,
+            page = DEFAULT_PAGE
+        } = req.query;
+
+        if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
+            res.status(400).send({ massage: "userId is required and must be a positive integer" });
+            return;
+        }
+
+        if (isNaN(parseInt(limit)) || parseInt(limit) < 1) {
+            res.status(400).send({ massage: "limit must be a positive integer" });
+            return;
+        }
+
+        if (isNaN(parseInt(page)) || parseInt(page) < 1) {
+            res.status(400).send({ massage: "page must be a positive integer" });
+            return;
+        }
+
         try {
-            const data = await todosService.getTodos();
+            const data = await todosService.getTodos(userId, limit, page);
 
             res.send(data);
         } catch (err: Error | unknown) {
@@ -13,11 +41,25 @@ class TodoController {
         }
     }
 
-    async getTodoById(req: Request, res: Response) {
-        try {
-            const id = req.params.id;
+    async getTodoById(req: Request<any, any, any, { userId: string }>, res: Response) {
+        const { userId } = req.query;
 
-            const data = await todosService.getTodoById(id);
+        if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
+            res.status(400).send({ massage: "userId is required and must be a positive integer" });
+            return;
+        }
+
+        const todoId = req.params.todoId;
+
+        if (!todoId || isNaN(parseInt(todoId)) || parseInt(todoId) < 1) {
+            res.status(400).send({ massage: "todoId is required and must be a positive integer" });
+            return;
+        }
+
+        try {
+            const todoId = req.params.todoId;
+
+            const data = await todosService.getTodoById(userId, todoId);
 
             res.send(data);
         } catch (err: Error | unknown) {
