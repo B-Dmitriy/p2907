@@ -17,7 +17,7 @@ CREATE TABLE todolist.roles (
 CREATE TABLE todolist.todos (
     id SERIAL PRIMARY KEY,
     user_id integer,
-    title varchar(255),
+    title varchar(255) NOT NULL,
     description text,
     is_done boolean DEFAULT FALSE,
     deadline timestamp CHECK (deadline < created_at),

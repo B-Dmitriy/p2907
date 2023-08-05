@@ -32,11 +32,13 @@ class TodosService {
         }
     }
 
-    async createTodo(title: string): Promise<ITodo | Error> {
+    async createTodo(userId: string, title: string, description: string, deadline: string): Promise<ITodo | Error> {
         try {
-            const id = Date.now();
-
-            const data = await db.any("INSERT INTO todos (id, title, is_done) VALUES (${id}, ${title}, false) RETURNING id;", { id, title });
+            /** TODO: RETURNING WORKING */
+            const data = await db.any(`INSERT INTO todolist.todos
+            (user_id, title, description, deadline) 
+            VALUES ($1, $2, $3, $4) RETURNING *;`,
+                [userId, title, description, deadline]);
 
             return { ...data[0], title, is_done: false }
         } catch (err) {
@@ -44,23 +46,31 @@ class TodosService {
         }
     }
 
-    async updateTodo(id: string, title: string, is_done: boolean): Promise<ITodo | Error> {
+    async updateTodo(userId: string, todoId: string, title: string, description: string, is_done: boolean, deadline: Date): Promise<ITodo | Error> {
         try {
-            await db.any("UPDATE todos SET title = ${title}, is_done = ${is_done} WHERE id = ${id};", { id, title, is_done });
+            /** TODO: RETURNING NOT WORKING */
+            await db.any(`UPDATE todolist.todos 
+            SET title = $1,
+            description = $2,
+            is_done = $3,
+            deadline = $4 
+            WHERE user_id = $5 AND id = $6
+            RETURNING *;`,
+                [title, description, is_done, deadline, userId, todoId]);
 
-            return { id, title, is_done };
+            return { id: todoId, title, is_done };
         } catch (err) {
             return errorHandler.databaseError(err);
         }
     }
 
-    async deleteTodo(id: string): Promise<string | Error> {
+    async deleteTodo(userId: string, todoId: string): Promise<any | Error> {
         try {
-            const returned = await db.any("DELETE FROM todos WHERE id = $1 RETURNING id;", id);
+            const returned = await db.any("DELETE FROM todolist.todos WHERE user_id = $1 AND id = $2 RETURNING *;", [userId, todoId]);
 
-            if (!returned.length) throw "Todo with id: " + id + " not found";
+            if (!returned.length) throw "Todo with id: " + todoId + " for user: " + userId + " not found";
 
-            return returned[0].id;
+            return returned;
         } catch (err) {
             return errorHandler.databaseError(err);
         }
