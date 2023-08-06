@@ -1,16 +1,20 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { todosService } from '../services/todosService';
-import { errorHandler } from './../utils/errorHandler';
+import { errorHandler } from '../utils/errorHandler';
+import { validator } from '../utils/validator';
+import {
+    GetTodosRequest,
+    GetTodoByIdRequest,
+    CreateTodoRequest,
+    UpdateTodoRequest,
+    DeleteTodoRequest,
+} from '../models/todosModels';
 
 const DEFAULT_LIMIT: string = '10';
 const DEFAULT_PAGE: string = '1';
 
 class TodoController {
-    async getTodos(req: Request<any, any, any, {
-        userId: string,
-        limit: string,
-        page: string,
-    }>, res: Response) {
+    async getTodos(req: GetTodosRequest, res: Response) {
         const {
             userId,
             limit = DEFAULT_LIMIT,
@@ -41,15 +45,14 @@ class TodoController {
         }
     }
 
-    async getTodoById(req: Request<any, any, any, { userId: string }>, res: Response) {
+    async getTodoById(req: GetTodoByIdRequest, res: Response) {
         const { userId } = req.query;
+        const { todoId } = req.params;
 
         if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
             res.status(400).send({ massage: "userId is required and must be a positive integer" });
             return;
         }
-
-        const todoId = req.params.todoId;
 
         if (!todoId || isNaN(parseInt(todoId)) || parseInt(todoId) < 1) {
             res.status(400).send({ massage: "todoId is required and must be a positive integer" });
@@ -65,11 +68,7 @@ class TodoController {
         }
     }
 
-    async createTodo(req: Request<any, {
-        title: string,
-        description: string,
-        deadline: string,
-    }, any, { userId: string }>, res: Response) {
+    async createTodo(req: CreateTodoRequest, res: Response) {
         const { userId } = req.query;
 
         if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
@@ -88,20 +87,19 @@ class TodoController {
         }
     }
 
-    async updateTodo(req: Request<any, {
-        title: string,
-        description: string,
-        is_done: boolean,
-        deadline: string,
-    }, any, { userId: string }>, res: Response) {
+    async updateTodo(req: UpdateTodoRequest, res: Response) {
         try {
             const { userId } = req.query;
-            const todoId = req.params.id;
+            const { todoId } = req.params;
             const { title, description, is_done, deadline } = req.body;
 
-            const deadlineDate = new Date(deadline);
 
-            const data = await todosService.updateTodo(userId, todoId, title, description, is_done, deadlineDate);
+            if (!validator.isIsoDate(deadline) && deadline !== null) {
+                res.status(400).send({ massage: "deadline must be ISOStrig time or null" });
+                return;
+            }
+
+            const data = await todosService.updateTodo(userId, todoId, title, description, is_done, deadline);
 
             res.send(data);
         } catch (err: Error | unknown) {
@@ -109,7 +107,7 @@ class TodoController {
         }
     }
 
-    async deleteTodo(req: Request<any, any, any, { userId: string }>, res: Response) {
+    async deleteTodo(req: DeleteTodoRequest, res: Response) {
         const { userId } = req.query;
         try {
             const todoId = req.params.todoId;

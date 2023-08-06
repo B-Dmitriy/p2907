@@ -16,7 +16,6 @@ class TodosService {
         } catch (err) {
             return errorHandler.databaseError(err);
         }
-
     }
 
     async getTodoById(userId: string, todoId: string): Promise<ITodo | Error> {
@@ -46,17 +45,18 @@ class TodosService {
         }
     }
 
-    async updateTodo(userId: string, todoId: string, title: string, description: string, is_done: boolean, deadline: Date): Promise<ITodo | Error> {
+    async updateTodo(userId: string, todoId: string, title: string, description: string, is_done: boolean, deadline: string): Promise<ITodo | Error> {
         try {
+            const timeNow = new Date().toISOString();
             /** TODO: RETURNING NOT WORKING */
             await db.any(`UPDATE todolist.todos 
             SET title = $1,
             description = $2,
             is_done = $3,
-            deadline = $4 
-            WHERE user_id = $5 AND id = $6
-            RETURNING *;`,
-                [title, description, is_done, deadline, userId, todoId]);
+            deadline = $4,
+            updated_at = $5
+            WHERE user_id = $6 AND id = $7;`,
+                [title, description, is_done, deadline, timeNow, userId, todoId]);
 
             return { id: todoId, title, is_done };
         } catch (err) {
