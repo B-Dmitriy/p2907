@@ -9,6 +9,11 @@ CREATE TABLE todolist.users (
     roles integer[]
 );
 
+CREATE TABLE todolist.tokens (
+    user_id SERIAL PRIMARY KEY,
+    refresh_token varchar(255)
+);
+
 CREATE TABLE todolist.roles (
     id SERIAL PRIMARY KEY,
     name varchar(255)

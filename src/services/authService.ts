@@ -37,12 +37,13 @@ class AuthService {
             const user = users[0];
 
             const token = jwt.sign({
-                // exp: Math.floor(Date.now() / 1000) + (60 * 60),
                 data: {
                     id: user.id,
                     role: user.role,
-                }
-            }, 'secret');
+                },
+            }, 'secret', {
+                // expiresIn: '30m' // время жизни токена 
+            });
 
             return {
                 id: user.id,
