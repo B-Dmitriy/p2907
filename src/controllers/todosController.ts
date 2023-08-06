@@ -96,12 +96,21 @@ class TodoController {
     }, any, { userId: string }>, res: Response) {
         try {
             const { userId } = req.query;
-            const todoId = req.params.id;
+            const { todoId } = req.params;
             const { title, description, is_done, deadline } = req.body;
 
-            const deadlineDate = new Date(deadline);
+            function isIsoDate(str: string) {
+                if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return false;
+                const d = new Date(str);
+                return d instanceof Date && !isNaN(d.getTime()) && d.toISOString() === str; // valid date 
+            }
 
-            const data = await todosService.updateTodo(userId, todoId, title, description, is_done, deadlineDate);
+            if (!isIsoDate(deadline) && deadline !== null) {
+                res.status(400).send({ massage: "deadline must be ISOStrig time or null" });
+                return;
+            }
+
+            const data = await todosService.updateTodo(userId, todoId, title, description, is_done, deadline);
 
             res.send(data);
         } catch (err: Error | unknown) {
