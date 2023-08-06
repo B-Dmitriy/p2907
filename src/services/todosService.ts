@@ -16,7 +16,6 @@ class TodosService {
         } catch (err) {
             return errorHandler.databaseError(err);
         }
-
     }
 
     async getTodoById(userId: string, todoId: string): Promise<ITodo | Error> {
