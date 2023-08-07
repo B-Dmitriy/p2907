@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { IRequestUser } from '../models/authModel';
+import { IRequestUser } from '../models/authModels';
 import { Request, Response, NextFunction } from 'express';
 
 export interface RequestAuth extends Request {
