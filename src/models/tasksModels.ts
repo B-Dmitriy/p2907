@@ -11,7 +11,41 @@ export interface Task {
 export type GetTasksRequest = Request<{
     todoId: string;
 }, {}, {}, {
-    userId: string,
-    limit: string,
-    page: string,
+    userId: string;
+    limit: string;
+    page: string;
+}>
+
+export type GetTasksByIdRequest = Request<{
+    todoId: string;
+    taskId: string;
+}, {}, {}, {
+    userId: string;
+}>
+
+export type CreateTaskRequest = Request<{
+    todoId: string;
+}, {}, {
+    title: string;
+    description: string;
+}, {
+    userId: string;
+}>
+
+export type UpdateTaskRequest = Request<{
+    todoId: string;
+    taskId: string;
+}, {}, {
+    title: string;
+    description: string;
+    isDone: boolean;
+}, {
+    userId: string;
+}>
+
+export type DeleteTaskRequest = Request<{
+    todoId: string;
+    taskId: string;
+}, {}, {}, {
+    userId: string;
 }>
