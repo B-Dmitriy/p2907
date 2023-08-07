@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../config/database';
 import { errorHandler } from '../utils/errorHandler';
-import { IPublicUserData, IUser } from '../models/authModel';
+import { IPublicUserData, IUser } from '../models/authModels';
 
 class AuthService {
     async me(id: string): Promise<IPublicUserData | Error> {
