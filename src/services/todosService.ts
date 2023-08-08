@@ -22,15 +22,14 @@ class TodosService {
 
     async getTodoById(userId: string, todoId: string): Promise<ITodo | Error> {
         try {
-            const data = await db.any(`
+            const todos = await db.any(`
                 SELECT * FROM todolist.todos 
                 WHERE user_id = $1 AND id=$2`,
                 [userId, todoId]);
 
-            console.log(data)
-            if (!data.length) throw APIError.NotFound(`Todo with id: ${todoId} for user: ${userId} not found`);
+            if (!todos.length) throw APIError.NotFound(`Todo with id: ${todoId} for user: ${userId} not found`);
 
-            return data[0];
+            return todos[0];
         } catch (err) {
             if (err instanceof APIError) {
                 throw err;

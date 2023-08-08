@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { tasksService } from '../services/tasksService';
 import {
     GetTasksRequest,
@@ -25,7 +25,7 @@ class TasksController {
 
             res.send(tasks);
         } catch (err) {
-            res.status(400).send({ message: 'Bad request' });
+            next(err);
         }
     }
 
@@ -38,7 +38,7 @@ class TasksController {
 
             res.send(task);
         } catch (err) {
-            res.status(400).send({ message: 'Bad request' });
+            next(err);
         }
     }
 
@@ -66,7 +66,7 @@ class TasksController {
 
             res.send(task);
         } catch (err) {
-            res.status(400).send({ message: 'Bad request' });
+            next(err);
         }
     }
 
@@ -79,7 +79,7 @@ class TasksController {
 
             res.send({ deleted: tasks });
         } catch (err) {
-            res.status(400).send({ message: 'Bad request' });
+            next(err);
         }
     }
 }
