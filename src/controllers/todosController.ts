@@ -23,22 +23,6 @@ class TodoController {
                 page = DEFAULT_PAGE
             } = req.query;
 
-            // if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
-            //     throw APIError.NotFound("adasd")
-            //     // res.status(400).send({ massage: "userId is required and must be a positive integer" });
-            //     // return;
-            // }
-
-            // if (isNaN(parseInt(limit)) || parseInt(limit) < 1) {
-            //     res.status(400).send({ massage: "limit must be a positive integer" });
-            //     return;
-            // }
-
-            // if (isNaN(parseInt(page)) || parseInt(page) < 1) {
-            //     res.status(400).send({ massage: "page must be a positive integer" });
-            //     return;
-            // }
-
             const data = await todosService.getTodos(userId, limit, page);
 
             res.send(data);
@@ -48,26 +32,14 @@ class TodoController {
     }
 
     async getTodoById(req: GetTodoByIdRequest, res: Response) {
-        const { userId } = req.query;
-        const { todoId } = req.params;
-
-        if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
-            res.status(400).send({ massage: "userId is required and must be a positive integer" });
-            return;
-        }
-
-        if (!todoId || isNaN(parseInt(todoId)) || parseInt(todoId) < 1) {
-            res.status(400).send({ massage: "todoId is required and must be a positive integer" });
-            return;
-        }
-
         try {
+            const { userId } = req.query;
+            const { todoId } = req.params;
+
             const data = await todosService.getTodoById(userId, todoId);
 
             res.send(data);
         } catch (err: Error | unknown) {
-
-            console.log("Catch by id", err);
             return errorHandler.notFound(res, err);
         }
     }
@@ -81,7 +53,7 @@ class TodoController {
         }
 
         try {
-            const { title, description = "", deadline = "" } = req.body;
+            const { title, description, deadline } = req.body;
 
             const data = await todosService.createTodo(userId, title, description, deadline);
 
