@@ -23,21 +23,21 @@ class TodoController {
                 page = DEFAULT_PAGE
             } = req.query;
 
-            if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
-                throw APIError.NotFound("adasd")
-                // res.status(400).send({ massage: "userId is required and must be a positive integer" });
-                // return;
-            }
+            // if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
+            //     throw APIError.NotFound("adasd")
+            //     // res.status(400).send({ massage: "userId is required and must be a positive integer" });
+            //     // return;
+            // }
 
-            if (isNaN(parseInt(limit)) || parseInt(limit) < 1) {
-                res.status(400).send({ massage: "limit must be a positive integer" });
-                return;
-            }
+            // if (isNaN(parseInt(limit)) || parseInt(limit) < 1) {
+            //     res.status(400).send({ massage: "limit must be a positive integer" });
+            //     return;
+            // }
 
-            if (isNaN(parseInt(page)) || parseInt(page) < 1) {
-                res.status(400).send({ massage: "page must be a positive integer" });
-                return;
-            }
+            // if (isNaN(parseInt(page)) || parseInt(page) < 1) {
+            //     res.status(400).send({ massage: "page must be a positive integer" });
+            //     return;
+            // }
 
             const data = await todosService.getTodos(userId, limit, page);
 
