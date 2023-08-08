@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { todosService } from '../services/todosService';
 import { errorHandler } from '../utils/errorHandler';
 import { validator } from '../utils/validator';
@@ -9,39 +9,41 @@ import {
     UpdateTodoRequest,
     DeleteTodoRequest,
 } from '../models/todosModels';
+import { APIError } from '../utils/APIError';
 
 const DEFAULT_LIMIT: string = '10';
 const DEFAULT_PAGE: string = '1';
 
 class TodoController {
-    async getTodos(req: GetTodosRequest, res: Response) {
-        const {
-            userId,
-            limit = DEFAULT_LIMIT,
-            page = DEFAULT_PAGE
-        } = req.query;
-
-        if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
-            res.status(400).send({ massage: "userId is required and must be a positive integer" });
-            return;
-        }
-
-        if (isNaN(parseInt(limit)) || parseInt(limit) < 1) {
-            res.status(400).send({ massage: "limit must be a positive integer" });
-            return;
-        }
-
-        if (isNaN(parseInt(page)) || parseInt(page) < 1) {
-            res.status(400).send({ massage: "page must be a positive integer" });
-            return;
-        }
-
+    async getTodos(req: GetTodosRequest, res: Response, next: NextFunction) {
         try {
+            const {
+                userId,
+                limit = DEFAULT_LIMIT,
+                page = DEFAULT_PAGE
+            } = req.query;
+
+            if (!userId || isNaN(parseInt(userId)) || parseInt(userId) < 1) {
+                throw APIError.NotFound("adasd")
+                // res.status(400).send({ massage: "userId is required and must be a positive integer" });
+                // return;
+            }
+
+            if (isNaN(parseInt(limit)) || parseInt(limit) < 1) {
+                res.status(400).send({ massage: "limit must be a positive integer" });
+                return;
+            }
+
+            if (isNaN(parseInt(page)) || parseInt(page) < 1) {
+                res.status(400).send({ massage: "page must be a positive integer" });
+                return;
+            }
+
             const data = await todosService.getTodos(userId, limit, page);
 
             res.send(data);
         } catch (err: Error | unknown) {
-            return errorHandler.notFound(res, err);
+            next(err);
         }
     }
 
@@ -64,6 +66,8 @@ class TodoController {
 
             res.send(data);
         } catch (err: Error | unknown) {
+
+            console.log("Catch by id", err);
             return errorHandler.notFound(res, err);
         }
     }
