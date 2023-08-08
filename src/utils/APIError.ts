@@ -23,6 +23,10 @@ class APIError extends Error {
     static NotFound(message: string) {
         return new APIError(404, message);
     }
+
+    static DatabaseError(message: string) {
+        return new APIError(500, message);
+    }
 }
 
 export { APIError };

@@ -1,4 +1,5 @@
 import { db } from '../config/database';
+import { APIError } from '../utils/APIError';
 import { Task } from '../models/tasksModels';
 
 class TasksService {
@@ -14,52 +15,65 @@ class TasksService {
 
             return tasks;
         } catch (err) {
-            throw new Error("Tasks database error");
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 
     async getTasksById(todoId: string, taskId: string): Promise<Task | Error> {
         try {
-            const task = await db.any(`
+            const tasks = await db.any(`
                 SELECT * FROM todolist.tasks 
                 WHERE todo_id = $1 AND id = $2;`,
                 [todoId, taskId]
             );
 
-            return task[0];
+            if (!tasks.length) throw APIError.NotFound(`Task with id: ${taskId} for todolist: ${todoId}: not found`);
+
+            return tasks[0];
         } catch (err) {
-            throw new Error("Tasks database error");
+            if (err instanceof APIError) {
+                throw err;
+            }
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 
     async createTask(todoId: string, title: string, description: string) {
         try {
             const task = await db.any(`
-                INSERT INTO todolist.tasks (todo_id, title, description)
-                VALUES ($1, $2, $3) RETURNING *;`,
+                INSERT INTO todolist.tasks 
+                (todo_id, title, description)
+                VALUES ($1, $2, $3) 
+                RETURNING *;`,
                 [todoId, title, description]
             );
 
             return task[0];
         } catch (err) {
-            throw new Error("Tasks database error");
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 
     async updateTask(todoId: string, taskId: string, title: string, description: string, is_done: boolean) {
         try {
-            const task = await db.any(`
+            const modify = await db.any(`
                 UPDATE todolist.tasks SET
                 title = $1,
                 description = $2,
                 is_done = $3
-                WHERE todo_id = $4 AND id = $5;`,
+                WHERE todo_id = $4 AND id = $5
+                RETURNING *;`,
                 [title, description, is_done, todoId, taskId]
             );
 
-            return task[0];
+            if (!modify.length) throw APIError.NotFound(`Task with id: ${taskId} for todo: ${todoId} not found`);
+
+            return modify[0];
         } catch (err) {
-            throw new Error("Tasks database error");
+            if (err instanceof APIError) {
+                throw err;
+            }
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 
@@ -73,7 +87,10 @@ class TasksService {
 
             return tasks;
         } catch (err) {
-            throw new Error("Tasks database error");
+            if (err instanceof APIError) {
+                throw err;
+            }
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 }
