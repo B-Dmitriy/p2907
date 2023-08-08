@@ -4,6 +4,7 @@ import coockeyParser from 'cookie-parser';
 import { authRouter } from '../routes/authRouter';
 import { todosRouter } from '../routes/todosRouter';
 import { tasksRouter } from '../routes/tasksRouter';
+import { errorsMiddleware } from '../middlewares/errorsMiddleware';
 import 'dotenv/config';
 
 const app = express();
@@ -15,5 +16,7 @@ app.use(coockeyParser());
 app.use('/auth', authRouter);
 app.use('/todos', todosRouter);
 app.use('/todos/', tasksRouter);
+
+app.use(errorsMiddleware);
 
 export { app };
