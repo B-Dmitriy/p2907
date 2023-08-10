@@ -24,6 +24,10 @@ class APIError extends Error {
         return new APIError(404, message);
     }
 
+    static Conflict(message: string) {
+        return new APIError(409, message);
+    }
+
     static DatabaseError(message: string) {
         return new APIError(500, message);
     }

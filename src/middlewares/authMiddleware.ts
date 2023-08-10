@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { IRequestUser } from '../models/authModels';
+import { TRequestUser } from '../models/authModels';
 import { Request, Response, NextFunction } from 'express';
 
 export interface RequestAuth extends Request {
-    user?: IRequestUser;
+    user?: TRequestUser;
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
