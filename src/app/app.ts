@@ -6,6 +6,7 @@ import { authRouter } from '../routes/authRouter';
 import { swaggerConfig } from '../config/swagger';
 import { todosRouter } from '../routes/todosRouter';
 import { tasksRouter } from '../routes/tasksRouter';
+import { errorsMiddleware } from '../middlewares/errorsMiddleware';
 import 'dotenv/config';
 
 const app = express();
@@ -31,5 +32,7 @@ app.use('/auth', authRouter);
 */
 app.use('/todos', todosRouter);
 app.use('/todos/', tasksRouter);
+
+app.use(errorsMiddleware);
 
 export { app };

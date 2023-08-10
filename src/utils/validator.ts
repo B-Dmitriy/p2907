@@ -4,6 +4,16 @@ class Validator {
         const d = new Date(str);
         return d instanceof Date && !isNaN(d.getTime()) && d.toISOString() === str; // valid date 
     }
+
+    isNotNullOrIsoDate(value: string | null) {
+        if (typeof value === 'string') {
+            return this.isIsoDate(value);
+        }
+        if (value === null) {
+            return true;
+        }
+        return false;
+    }
 }
 
 export const validator = new Validator();
