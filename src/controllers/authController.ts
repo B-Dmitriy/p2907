@@ -1,10 +1,11 @@
-import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import { NextFunction, Request, Response } from 'express';
 import { RequestAuth } from '../middlewares/authMiddleware';
 import { authService } from '../services/authService';
-import { errorHandler } from '../utils/errorHandler';
+import { TRegistrationRequest } from '../models/authModels';
 
 class AuthController {
-    async me(req: RequestAuth, res: Response) {
+    async me(req: RequestAuth, res: Response, next: NextFunction) {
         try {
             const id = req.user?.id || '';
 
@@ -12,11 +13,11 @@ class AuthController {
 
             res.send(user);
         } catch (err: Error | unknown) {
-            return errorHandler.notFound(res, err);
+            next(err);
         }
     }
 
-    async login(req: Request, res: Response) {
+    async login(req: Request, res: Response, next: NextFunction) {
         try {
             const { login, password } = req.body;
 
@@ -24,19 +25,32 @@ class AuthController {
 
             res.send(user);
         } catch (err: Error | unknown) {
-            return errorHandler.notFound(res, err);
+            next(err);
         }
     }
 
-    async registration(req: Request, res: Response) {
+    async registration(req: TRegistrationRequest, res: Response, next: NextFunction) {
         try {
             const userData = req.body;
 
             const user = await authService.registration(userData);
 
-            res.send(user);
+
+            const accessToken = jwt.sign({
+                data: { id: user.id },
+            }, 'access-secret', {
+                expiresIn: '30m' // время жизни токена 
+            });
+
+            const refreshToken = jwt.sign({
+                data: { id: user.id },
+            }, 'refresh-secret', {
+                expiresIn: '30d' // время жизни токена 
+            });
+
+            res.send({ user, accessToken, refreshToken });
         } catch (err: Error | unknown) {
-            return errorHandler.notFound(res, err);
+            next(err);
         }
     }
 }

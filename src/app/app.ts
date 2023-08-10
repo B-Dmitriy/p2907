@@ -11,25 +11,17 @@ import 'dotenv/config';
 
 const app = express();
 
-app.use(
-    "/api-docs",
-    swaggerUI.serve,
-    swaggerUI.setup(swaggerConfig)
-);
+// app.use(
+//     "/api-docs",
+//     swaggerUI.serve,
+//     swaggerUI.setup(swaggerConfig)
+// );
 
 app.use(express.json());
 app.use(cors());
 app.use(coockeyParser());
 
 app.use('/auth', authRouter);
-/**
-* @swagger
-* 
-* /todos
-*   get:
-*     description: contains a reference outside this file
-*     x-amazon-apigateway-integration: *default-integration
-*/
 app.use('/todos', todosRouter);
 app.use('/todos/', tasksRouter);
 

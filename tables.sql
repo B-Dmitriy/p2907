@@ -3,10 +3,11 @@ CREATE SCHEMA todolist;
 CREATE TABLE todolist.users (
     id SERIAL PRIMARY KEY,
     login varchar(255) UNIQUE NOT NULL,
-    password varchar(255) NOT NULL,
-    email varchar(255) UNIQUE NOT NULL,
+    password varchar(255) NOT NULL CHECK (password IS NOT NULL AND password != ''),
+    email varchar(255) UNIQUE NOT NULL CHECK (email IS NOT NULL AND email != ''),
+    confirmed boolean DEFAULT FALSE,
     phone varchar(64),
-    roles integer[]
+    roles integer[] DEFAULT '{2}'
 );
 
 CREATE TABLE todolist.tokens (
@@ -42,9 +43,9 @@ CREATE TABLE todolist.tasks (
 
 INSERT INTO todolist.roles (name) VALUES ('admin'), ('user'); 
 
-INSERT INTO todolist.users (login, password, email, phone, roles) VALUES 
-('petr', 'qwerty123', 'petr@mail.ru', '8-800-900-66-33', '{2}'), 
-('oleg', 'oleg123', 'oleg@mail.ru', '8-800-800-00-21', '{2}');
+INSERT INTO todolist.users (login, password, email, phone) VALUES 
+('petr', 'qwerty123', 'petr@mail.ru', '8-800-900-66-33'), 
+('oleg', 'oleg123', 'oleg@mail.ru', '8-800-800-00-21');
 
 INSERT INTO todolist.todos (user_id, title, description, is_done, deadline) VALUES 
 (1, 'todo1', NULL, FALSE, NULL),

@@ -2,10 +2,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { db } from '../config/database';
 import { errorHandler } from '../utils/errorHandler';
-import { IPublicUserData, IUser } from '../models/authModels';
+import { IPublicUserData, TRegistrationUserData } from '../models/authModels';
+import { APIError } from '../utils/APIError';
 
 class AuthService {
-    async me(id: string): Promise<IPublicUserData | Error> {
+    async me(id: string) {
         try {
             const users = await db.any("SELECT * FROM users WHERE id = $1;", id);
 
@@ -57,32 +58,35 @@ class AuthService {
 
     }
 
-    async registration(data: IUser): Promise<IPublicUserData | Error> {
+    async registration({ login, password, email, phone_number }: TRegistrationUserData): Promise<IPublicUserData> {
         try {
-            const id = Date.now();
             const salt = bcrypt.genSaltSync(7);
-            const hashPassword = bcrypt.hashSync(data.password, salt);
-            const users = await db.any("SELECT * FROM users WHERE login = $1;", data.login);
+            const hashPassword = bcrypt.hashSync(password, salt);
 
-            if (users.length) throw "User with login: " + data.login + " already existing";
+            const users = await db.any(`
+                SELECT * FROM todolist.users 
+                WHERE login = $1 OR email = $2;`, [login, email]);
 
-            await db.any("INSERT INTO users" +
-                "(id, login, password, email, phone_number, role)" +
-                "VALUES (${id}, ${login}, ${password}, ${email}, ${phone_number}, ${role});", {
-                ...data,
-                id: id,
-                password: hashPassword,
-            });
+            if (users.length) throw APIError.Conflict(`User with login: ${login} or email: ${email} already existing`);
 
-            const user = { ...data };
+            const newUser = await db.any(`
+                INSERT INTO todolist.users
+                (login, password, email, phone)
+                VALUES ($1, $2, $3, $4) 
+                RETURNING *;`,
+                [login, hashPassword, email, phone_number]);
 
             return {
-                id: id.toString(),
-                login: user.login,
-                email: user.email,
-            };
+                id: newUser[0].id,
+                login: newUser[0].login,
+                email: newUser[0].email,
+                confirmed: newUser[0].confirmed,
+            }
         } catch (err) {
-            return errorHandler.databaseError(err);
+            if (err instanceof APIError) {
+                throw err;
+            }
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 }
