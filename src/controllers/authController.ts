@@ -8,9 +8,11 @@ import { APIError } from '../utils/APIError';
 class AuthController {
     async me(req: RequestAuth, res: Response, next: NextFunction) {
         try {
-            const id = req.user?.id || '';
+            const id = req.user?.id;
 
-            const data = await authService.me(id);
+            if (!id) throw APIError.NotAuthorized();
+
+            const data = await authService.me(id as string);
 
             res.send(data);
         } catch (err: Error | unknown) {
@@ -24,16 +26,29 @@ class AuthController {
 
             const user = await authService.login(login, password);
 
-            const { accessToken, refreshToken } = await tokensService.generateTokens({
-                id: user.id,
-                roles: user.roles,
-            });
+            const { accessToken, refreshToken } = tokensService.generateTokens(user);
 
             await tokensService.saveToken(user.id, refreshToken);
 
             res
                 .cookie('refreshToken', refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
                 .send({ user, accessToken });
+        } catch (err: Error | unknown) {
+            next(err);
+        }
+    }
+
+    async logout(req: TLoginRequest, res: Response, next: NextFunction) {
+        try {
+            /** TODO: Перенести тип в модель User */
+            // @ts-ignore
+            const id = req.user?.id;
+
+            if (!id) throw APIError.NotAuthorized();
+
+            await tokensService.deleteRefreshToken(id);
+
+            res.status(204).send();
         } catch (err: Error | unknown) {
             next(err);
         }
@@ -47,10 +62,7 @@ class AuthController {
 
             if (!user) throw APIError.NotFound(`User ${userData.login} not found`);
 
-            const { accessToken, refreshToken } = await tokensService.generateTokens({
-                id: user.id,
-                roles: user.roles,
-            });
+            const { accessToken, refreshToken } = tokensService.generateTokens(user);
 
             await tokensService.saveToken(user.id, refreshToken);
 

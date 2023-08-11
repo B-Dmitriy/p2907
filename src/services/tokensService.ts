@@ -4,7 +4,7 @@ import { APIError } from '../utils/APIError';
 import { TJWVPayload } from '../models/authModels';
 
 class TokensService {
-    async generateTokens(userData: { id: string, roles: number[] }) {
+    generateTokens(userData: { id: string, roles: number[] }) {
         try {
             const accessToken = jwt.sign(userData, 'access-secret', {
                 expiresIn: '30m' // время жизни токена 
@@ -46,22 +46,27 @@ class TokensService {
             throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
-
-    verifyToken(token: string) {
+    verifyAccessToken(token: string) {
         try {
+            let userData;
             jwt.verify(token, 'access-secret', (err, data) => {
-                if (err) {
+                if (err !== null) {
                     throw APIError.NotAuthorized(err.message);
                 } else {
-                    return data;
+                    userData = data
                 }
             });
+            return userData;
+        } catch (e) {
+            return null;
+        }
+    }
 
+    async deleteRefreshToken(userId: string) {
+        try {
+            await db.any(`DELETE FROM todolist.tokens WHERE user_id = $1;`, userId);
         } catch (err) {
-            if (err instanceof APIError) {
-                throw err;
-            }
-            throw APIError.NotAuthorized();
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 }

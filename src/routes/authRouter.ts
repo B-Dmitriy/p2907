@@ -22,6 +22,13 @@ router.post('/login',
     validationMiddleware,
     authController.login);
 
+router.get('/logout',
+    header('Authorization')
+        .notEmpty().withMessage("Authorization header is required"),
+    validationMiddleware,
+    authMiddleware,
+    authController.logout);
+
 router.post('/registration',
     body('login')
         .trim().notEmpty().isLength({ min: 3 }).withMessage("login required and must be longest 3 chars"),

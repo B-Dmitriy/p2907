@@ -4,6 +4,7 @@ import { db } from '../config/database';
 import { errorHandler } from '../utils/errorHandler';
 import { IPublicUserData, TRegistrationUserData } from '../models/authModels';
 import { APIError } from '../utils/APIError';
+import { tokensService } from './tokensService';
 
 class AuthService {
     async me(id: string) {
@@ -32,7 +33,7 @@ class AuthService {
     async login(login: string, password: string): Promise<IPublicUserData> {
         try {
             const users = await db.any(`
-                SELECT * FROM users 
+                SELECT * FROM todolist.users 
                 WHERE login = $1;`,
                 login);
 
@@ -58,6 +59,14 @@ class AuthService {
             throw APIError.DatabaseError(`Database error: ${err}`);
         }
 
+    }
+
+    async logout(userId: string) {
+        try {
+            await tokensService.deleteRefreshToken(userId);
+        } catch (err) {
+            throw APIError.DatabaseError(`Database error: ${err}`);
+        }
     }
 
     async registration({ login, password, email, phone_number }: TRegistrationUserData): Promise<IPublicUserData> {
