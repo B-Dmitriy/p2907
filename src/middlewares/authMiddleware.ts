@@ -1,6 +1,7 @@
-import jwt from 'jsonwebtoken';
-import { TRequestUser } from '../models/authModels';
+import { TRequestUser, TJWVPayload } from '../models/authModels';
 import { Request, Response, NextFunction } from 'express';
+import { APIError } from '../utils/APIError';
+import { tokensService } from '../services/tokensService';
 
 export interface RequestAuth extends Request {
     user?: TRequestUser;
@@ -11,18 +12,21 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            return res.status(403).send({})
+            return APIError.NotAuthorized();
         }
 
-        const user = jwt.verify(token, 'secret');
+        tokensService.verifyToken(token);
 
         Object.defineProperty(req, 'user', {
-            value: user,
+            value: {
+                // id: user.id,
+                // roles: user.roles,
+            },
             writable: false,
         });
 
         next();
     } catch (e) {
-        return res.status(403).send({});
+        next(e);
     }
 }

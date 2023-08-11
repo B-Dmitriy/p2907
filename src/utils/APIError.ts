@@ -12,8 +12,8 @@ class APIError extends Error {
         this.errors = errors || [];
     }
 
-    static NotAuthorized() {
-        return new APIError(401, "Not authorized");
+    static NotAuthorized(message: string = "Not authorized") {
+        return new APIError(401, message);
     }
 
     static BadRequest(message: string, errors: ValidationError[]) {

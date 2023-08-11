@@ -8,9 +8,11 @@ import { APIError } from '../utils/APIError';
 class AuthService {
     async me(id: string) {
         try {
-            const users = await db.any("SELECT * FROM users WHERE id = $1;", id);
+            const users = await db.any(`
+                SELECT * FROM todolist.users 
+                WHERE id = $1;`, id);
 
-            if (!users.length) throw "Oshibka dostupa";
+            if (!users.length) throw APIError.NotFound(`Me data not found`);
 
             const user = users[0];
 
@@ -20,40 +22,40 @@ class AuthService {
                 email: user.email,
             };
         } catch (err) {
-            return errorHandler.databaseError(err);
+            if (err instanceof APIError) {
+                throw err;
+            }
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
     }
 
-    async login(login: string, password: string): Promise<any | Error> {
-
+    async login(login: string, password: string): Promise<IPublicUserData> {
         try {
-            const users = await db.any("SELECT * FROM users WHERE login = $1;", login);
+            const users = await db.any(`
+                SELECT * FROM users 
+                WHERE login = $1;`,
+                login);
 
-            if (!users.length) throw "User with login: " + login + " not found";
-
-            if (!bcrypt.compareSync(password, users[0].password)) {
-                throw "Wrong password!";
-            };
+            if (!users.length) throw APIError.Conflict('Wrong login details');
 
             const user = users[0];
 
-            const token = jwt.sign({
-                data: {
-                    id: user.id,
-                    role: user.role,
-                },
-            }, 'secret', {
-                // expiresIn: '30m' // время жизни токена 
-            });
+            if (!bcrypt.compareSync(password, user.password)) {
+                throw APIError.Conflict("Wrong login details");
+            };
 
             return {
                 id: user.id,
                 login: user.login,
                 email: user.email,
-                token,
+                confirmed: user.confirmed,
+                roles: user.roles
             };
         } catch (err) {
-            return errorHandler.databaseError(err);
+            if (err instanceof APIError) {
+                throw err;
+            }
+            throw APIError.DatabaseError(`Database error: ${err}`);
         }
 
     }
@@ -81,6 +83,7 @@ class AuthService {
                 login: newUser[0].login,
                 email: newUser[0].email,
                 confirmed: newUser[0].confirmed,
+                roles: newUser[0].roles,
             }
         } catch (err) {
             if (err instanceof APIError) {

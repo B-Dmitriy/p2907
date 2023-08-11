@@ -1,29 +1,39 @@
-import jwt from 'jsonwebtoken';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { RequestAuth } from '../middlewares/authMiddleware';
 import { authService } from '../services/authService';
-import { TRegistrationRequest } from '../models/authModels';
+import { TRegistrationRequest, TLoginRequest } from '../models/authModels';
+import { tokensService } from '../services/tokensService';
+import { APIError } from '../utils/APIError';
 
 class AuthController {
     async me(req: RequestAuth, res: Response, next: NextFunction) {
         try {
             const id = req.user?.id || '';
 
-            const user = await authService.me(id);
+            const data = await authService.me(id);
 
-            res.send(user);
+            res.send(data);
         } catch (err: Error | unknown) {
             next(err);
         }
     }
 
-    async login(req: Request, res: Response, next: NextFunction) {
+    async login(req: TLoginRequest, res: Response, next: NextFunction) {
         try {
             const { login, password } = req.body;
 
             const user = await authService.login(login, password);
 
-            res.send(user);
+            const { accessToken, refreshToken } = await tokensService.generateTokens({
+                id: user.id,
+                roles: user.roles,
+            });
+
+            await tokensService.saveToken(user.id, refreshToken);
+
+            res
+                .cookie('refreshToken', refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+                .send({ user, accessToken });
         } catch (err: Error | unknown) {
             next(err);
         }
@@ -35,20 +45,19 @@ class AuthController {
 
             const user = await authService.registration(userData);
 
+            if (!user) throw APIError.NotFound(`User ${userData.login} not found`);
 
-            const accessToken = jwt.sign({
-                data: { id: user.id },
-            }, 'access-secret', {
-                expiresIn: '30m' // время жизни токена 
+            const { accessToken, refreshToken } = await tokensService.generateTokens({
+                id: user.id,
+                roles: user.roles,
             });
 
-            const refreshToken = jwt.sign({
-                data: { id: user.id },
-            }, 'refresh-secret', {
-                expiresIn: '30d' // время жизни токена 
-            });
+            await tokensService.saveToken(user.id, refreshToken);
 
-            res.send({ user, accessToken, refreshToken });
+            res
+                .status(201)
+                .cookie('refreshToken', refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+                .send({ user, accessToken });
         } catch (err: Error | unknown) {
             next(err);
         }

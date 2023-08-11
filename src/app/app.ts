@@ -1,9 +1,9 @@
 import cors from 'cors';
 import express from 'express';
 import coockeyParser from 'cookie-parser';
-import swaggerUI from 'swagger-ui-express';
+// import swaggerUI from 'swagger-ui-express';
 import { authRouter } from '../routes/authRouter';
-import { swaggerConfig } from '../config/swagger';
+// import { swaggerConfig } from '../config/swagger';
 import { todosRouter } from '../routes/todosRouter';
 import { tasksRouter } from '../routes/tasksRouter';
 import { errorsMiddleware } from '../middlewares/errorsMiddleware';

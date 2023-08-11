@@ -1,25 +1,25 @@
 import { Request } from "express";
-import { type } from "os";
-
-export type TRole = "user" | "admin";
 
 export interface IPublicUserData {
     id: string;
     login: string;
     email: string;
     confirmed: boolean;
+    roles: number[];
 }
 
 export interface IPrivateUserData {
     password: string;
     phone_number: string | null;
-    role: TRole;
 }
 
 export interface IUser extends IPublicUserData, IPrivateUserData { }
 
-export type TRequestUser = Pick<IUser, 'id' | 'role'>
 
-export type TRegistrationUserData = Omit<IUser, 'id' | 'confirmed' | 'role'>;
+type TLoginData = Pick<IUser, 'login' | 'password'>;
+export type TRequestUser = Pick<IUser, 'id' | 'roles'>;
+export type TJWVPayload = TRequestUser;
+export type TRegistrationUserData = Omit<IUser, 'id' | 'confirmed' | 'roles'>;
 
 export type TRegistrationRequest = Request<{}, {}, TRegistrationUserData>;
+export type TLoginRequest = Request<{}, {}, TLoginData>;
