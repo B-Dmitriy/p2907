@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, header, param, query } from 'express-validator';
+import { body, cookie, header, query } from 'express-validator';
 import { authController } from '../controllers/authController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { validationMiddleware } from '../middlewares/validationMiddleware';
@@ -39,5 +39,12 @@ router.post('/registration',
         .isEmail().withMessage("Not valid email"),
     validationMiddleware,
     authController.registration);
+
+router.post('/refresh',
+    cookie('refreshToken').withMessage("refreshToken is required"),
+    query('userId').notEmpty().trim().isInt({ min: 1 }).withMessage("userId is required and must be a positive integer"),
+    validationMiddleware,
+    authMiddleware,
+    authController.logout);
 
 export const authRouter = router;
