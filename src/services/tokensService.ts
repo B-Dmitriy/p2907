@@ -20,14 +20,14 @@ class TokensService {
         }
     }
 
-    verifyAccessToken(token: string) {
+    verifyAccessToken(token: string): TJWVPayload | null {
         try {
-            let userData;
+            let userData: TJWVPayload = { id: '', roles: [] };
             jwt.verify(token, 'access-secret', (err, data) => {
                 if (err !== null) {
                     throw APIError.NotAuthorized(err.message);
                 } else {
-                    userData = data
+                    userData = data as TJWVPayload
                 }
             });
             return userData;

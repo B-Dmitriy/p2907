@@ -12,11 +12,11 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     try {
         const token = req.headers.authorization?.split(' ')[1];
 
-        if (!token) {
-            return APIError.NotAuthorized();
-        }
+        if (!token) return next(APIError.NotAuthorized());
 
         const data = tokensService.verifyAccessToken(token);
+
+        if (!data) return next(APIError.NotAuthorized());
 
         Object.defineProperty(req, 'user', {
             value: data,
