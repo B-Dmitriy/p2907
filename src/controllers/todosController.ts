@@ -45,6 +45,7 @@ class TodoController {
         try {
             const { userId } = req.query;
             const { title, description, deadline } = req.body;
+
             const data = await todosService.createTodo(userId, title, description, deadline);
 
             res.status(201).send(data);

@@ -48,7 +48,9 @@ class AuthController {
 
             await tokensService.deleteRefreshToken(id);
 
-            res.status(204).send();
+            res
+                .clearCookie('refreshToken')
+                .status(204).send();
         } catch (err: Error | unknown) {
             next(err);
         }
@@ -69,6 +71,23 @@ class AuthController {
             res
                 .status(201)
                 .cookie('refreshToken', refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+                .send({ user, accessToken });
+        } catch (err: Error | unknown) {
+            next(err);
+        }
+    }
+
+    async refresh(req: any, res: Response, next: NextFunction) {
+        try {
+            const { refreshToken } = req.cookie;
+
+            const { userId, accessToken, refreshToken: newRefreshToken } = await tokensService.refreshToken(refreshToken);
+
+            const user = authService.me(userId);
+
+            res
+                .status(201)
+                .cookie('refreshToken', newRefreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
                 .send({ user, accessToken });
         } catch (err: Error | unknown) {
             next(err);
