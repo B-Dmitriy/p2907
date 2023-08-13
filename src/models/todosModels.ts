@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import type { Request } from 'express';
 
 export type GetTodosRequest = Request<{}, {}, {}, {
     limit: string,
@@ -15,12 +15,12 @@ export type CreateTodoRequest = Request<{}, {}, {
     deadline: string,
 }, {}>
 
-export type UpdateTodoRequest = Request<any, {
+export type UpdateTodoRequest = Request<{}, {
     title: string,
     description: string,
     is_done: boolean,
     deadline: string,
-}, any, {}>
+}, {}, {}>
 
 export type DeleteTodoRequest = Request<{
     todoId: string;
