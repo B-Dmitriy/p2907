@@ -1,10 +1,9 @@
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
 import { ITodo } from '../models/todosModels';
-import { errorHandler } from '../utils/errorHandler';
 
 class TodosService {
-    async getTodos(userId: string, limit: string, page: string): Promise<ITodo[] | Error> {
+    async getTodos(userId: string, limit: string, page: string): Promise<ITodo[]> {
         try {
             const offset = page === '1' ? 0 : (parseInt(page) * parseInt(limit) - parseInt(limit));
 
@@ -20,7 +19,7 @@ class TodosService {
         }
     }
 
-    async getTodoById(userId: string, todoId: string): Promise<ITodo | Error> {
+    async getTodoById(userId: string, todoId: string): Promise<ITodo> {
         try {
             const todos = await db.any(`
                 SELECT * FROM todolist.todos 
@@ -38,7 +37,7 @@ class TodosService {
         }
     }
 
-    async createTodo(userId: string, title: string, description: string, deadline: string) {
+    async createTodo(userId: string, title: string, description: string, deadline: string): Promise<ITodo> {
         try {
             const newTodos = await db.any(`
                 INSERT INTO todolist.todos
@@ -53,7 +52,7 @@ class TodosService {
         }
     }
 
-    async updateTodo(userId: string, todoId: string, title: string, description: string, is_done: boolean, deadline: string): Promise<ITodo | Error> {
+    async updateTodo(userId: string, todoId: string, title: string, description: string, is_done: boolean, deadline: string): Promise<ITodo> {
         try {
             const timeNow = new Date().toISOString();
 
@@ -79,7 +78,7 @@ class TodosService {
         }
     }
 
-    async deleteTodo(userId: string, todoId: string): Promise<any | Error> {
+    async deleteTodo(userId: string, todoId: string): Promise<ITodo> {
         try {
             const deleted = await db.any(`
                 DELETE FROM todolist.todos 

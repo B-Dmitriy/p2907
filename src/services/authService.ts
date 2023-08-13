@@ -1,13 +1,11 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { db } from '../config/database';
-import { errorHandler } from '../utils/errorHandler';
-import { IPublicUserData, TRegistrationUserData } from '../models/authModels';
 import { APIError } from '../utils/APIError';
 import { tokensService } from './tokensService';
+import type { IPublicUserData, TRegistrationUserData } from '../models/authModels';
 
 class AuthService {
-    async me(id: string) {
+    async me(id: string): Promise<IPublicUserData> {
         try {
             const users = await db.any(`
                 SELECT * FROM todolist.users 
@@ -15,18 +13,20 @@ class AuthService {
 
             if (!users.length) throw APIError.NotFound(`Me data not found`);
 
-            const user = users[0];
+            const user: IPublicUserData = users[0];
 
             return {
                 id: user.id,
                 login: user.login,
                 email: user.email,
+                confirmed: user.confirmed,
+                roles: user.roles,
             };
         } catch (err) {
             if (err instanceof APIError) {
                 throw err;
             }
-            throw APIError.DatabaseError(`Database error: ${err}`);
+            throw APIError.DatabaseError(`[Database error] ${err}`);
         }
     }
 
@@ -56,16 +56,16 @@ class AuthService {
             if (err instanceof APIError) {
                 throw err;
             }
-            throw APIError.DatabaseError(`Database error: ${err}`);
+            throw APIError.DatabaseError(`[Database error] ${err}`);
         }
 
     }
 
-    async logout(userId: string) {
+    async logout(userId: string): Promise<void> {
         try {
             await tokensService.deleteRefreshToken(userId);
         } catch (err) {
-            throw APIError.DatabaseError(`Database error: ${err}`);
+            throw APIError.DatabaseError(`[Database error] ${err}`);
         }
     }
 
@@ -80,25 +80,28 @@ class AuthService {
 
             if (users.length) throw APIError.Conflict(`User with login: ${login} or email: ${email} already existing`);
 
-            const newUser = await db.any(`
+            const data = await db.any(`
                 INSERT INTO todolist.users
                 (login, password, email, phone)
                 VALUES ($1, $2, $3, $4) 
                 RETURNING *;`,
                 [login, hashPassword, email, phone_number]);
 
+
+            const newUser: IPublicUserData = data[0];
+
             return {
-                id: newUser[0].id,
-                login: newUser[0].login,
-                email: newUser[0].email,
-                confirmed: newUser[0].confirmed,
-                roles: newUser[0].roles,
+                id: newUser.id,
+                login: newUser.login,
+                email: newUser.email,
+                confirmed: newUser.confirmed,
+                roles: newUser.roles,
             }
         } catch (err) {
             if (err instanceof APIError) {
                 throw err;
             }
-            throw APIError.DatabaseError(`Database error: ${err}`);
+            throw APIError.DatabaseError(`[Database error] ${err}`);
         }
     }
 }

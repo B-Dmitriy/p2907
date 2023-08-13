@@ -1,12 +1,13 @@
-import { Response, NextFunction } from "express";
 import { tasksService } from '../services/tasksService';
-import {
+import type { Response, NextFunction } from "express";
+import type {
     GetTasksRequest,
     GetTasksByIdRequest,
     CreateTaskRequest,
     UpdateTaskRequest,
     DeleteTaskRequest,
 } from '../models/tasksModels';
+import { APIError } from '../utils/APIError';
 
 const DEFAULT_LIMIT: string = '5';
 const DEFAULT_PAGE: string = '1';
@@ -15,11 +16,11 @@ class TasksController {
     async getTasks(req: GetTasksRequest, res: Response, next: NextFunction) {
         try {
             const { todoId } = req.params;
-            const {
-                userId,
-                limit = DEFAULT_LIMIT,
-                page = DEFAULT_PAGE
-            } = req.query;
+            const { id: userId } = req.user;
+            const { id: tokenUserId } = req.user;
+            const { limit = DEFAULT_LIMIT, page = DEFAULT_PAGE } = req.query;
+
+            if (userId !== tokenUserId) throw APIError.Forbidden();
 
             const tasks = await tasksService.getTasks(todoId, limit, page);
 
@@ -32,7 +33,10 @@ class TasksController {
     async getTaskById(req: GetTasksByIdRequest, res: Response, next: NextFunction) {
         try {
             const { todoId, taskId } = req.params;
-            const { userId } = req.query;
+            const { id: userId } = req.user;
+            const { id: tokenUserId } = req.user;
+
+            if (userId !== tokenUserId) throw APIError.Forbidden();
 
             const task = await tasksService.getTasksById(todoId, taskId);
 
@@ -46,13 +50,16 @@ class TasksController {
         try {
             const { todoId } = req.params;
             const { userId } = req.query;
+            const { id: tokenUserId } = req.user;
             const { title, description } = req.body;
+
+            if (userId !== tokenUserId) throw APIError.Forbidden();
 
             const task = await tasksService.createTask(todoId, title, description);
 
             res.send(task);
         } catch (err) {
-            res.status(400).send({ message: 'Bad request' });
+            next(err);
         }
     }
 
@@ -60,7 +67,10 @@ class TasksController {
         try {
             const { todoId, taskId } = req.params;
             const { userId } = req.query;
+            const { id: tokenUserId } = req.user;
             const { title, description, isDone } = req.body;
+
+            if (userId !== tokenUserId) throw APIError.Forbidden();
 
             const task = await tasksService.updateTask(todoId, taskId, title, description, isDone);
 
@@ -74,6 +84,9 @@ class TasksController {
         try {
             const { todoId, taskId } = req.params;
             const { userId } = req.query;
+            const { id: tokenUserId } = req.user;
+
+            if (userId !== tokenUserId) throw APIError.Forbidden();
 
             const tasks = await tasksService.deleteTask(todoId, taskId);
 

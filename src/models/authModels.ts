@@ -15,7 +15,6 @@ export interface IPrivateUserData {
 
 export interface IUser extends IPublicUserData, IPrivateUserData { }
 
-
 type TLoginData = Pick<IUser, 'login' | 'password'>;
 export type TRequestUser = Pick<IUser, 'id' | 'roles'>;
 export type TJWVPayload = TRequestUser;

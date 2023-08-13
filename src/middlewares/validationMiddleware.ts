@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { APIError } from '../utils/APIError';
 
-export function validationMiddleware(req: Request, res: Response, next: NextFunction) {
+export function validationMiddleware(req: Request, _: Response, next: NextFunction) {
     const result = validationResult(req);
     if (!result.isEmpty()) {
         next(APIError.BadRequest("validation error", result.array()));

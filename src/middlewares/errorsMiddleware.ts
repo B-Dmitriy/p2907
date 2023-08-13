@@ -1,12 +1,17 @@
-import { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
 import { APIError } from '../utils/APIError';
+import type { NextFunction, Request, Response } from 'express';
 
-export function errorsMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
+/** NextFunction - из параметров не удалять! Express так понимает что это error handler */
+export function errorsMiddleware(err: Error, _: Request, res: Response, next: NextFunction) {
     if (err instanceof APIError) {
-        return res.status(err.status).send({
-            message: err.message,
-            errors: err.errors,
-        });
+        return res
+            .status(err.status)
+            .send({
+                message: err.message,
+                errors: err.errors,
+            });
     }
-    return res.status(500).send({ message: "Server internal error" });
+    return res
+        .status(500)
+        .send({ message: "Server internal error" });
 }

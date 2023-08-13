@@ -1,6 +1,6 @@
-import { NextFunction, Response } from 'express';
 import { todosService } from '../services/todosService';
-import {
+import type { NextFunction, Response } from 'express';
+import type {
     GetTodosRequest,
     GetTodoByIdRequest,
     CreateTodoRequest,
@@ -14,11 +14,8 @@ const DEFAULT_PAGE: string = '1';
 class TodoController {
     async getTodos(req: GetTodosRequest, res: Response, next: NextFunction) {
         try {
-            const {
-                userId,
-                limit = DEFAULT_LIMIT,
-                page = DEFAULT_PAGE
-            } = req.query;
+            const { id: userId } = req.user;
+            const { limit = DEFAULT_LIMIT, page = DEFAULT_PAGE } = req.query;
 
             const data = await todosService.getTodos(userId, limit, page);
 
@@ -30,7 +27,7 @@ class TodoController {
 
     async getTodoById(req: GetTodoByIdRequest, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.query;
+            const { id: userId } = req.user;
             const { todoId } = req.params;
 
             const data = await todosService.getTodoById(userId, todoId);
@@ -43,7 +40,7 @@ class TodoController {
 
     async createTodo(req: CreateTodoRequest, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.query;
+            const { id: userId } = req.user;
             const { title, description, deadline } = req.body;
 
             const data = await todosService.createTodo(userId, title, description, deadline);
@@ -56,7 +53,7 @@ class TodoController {
 
     async updateTodo(req: UpdateTodoRequest, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.query;
+            const { id: userId } = req.user;
             const { todoId } = req.params;
             const { title, description, is_done, deadline } = req.body;
 
@@ -70,12 +67,12 @@ class TodoController {
 
     async deleteTodo(req: DeleteTodoRequest, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.query;
-            const todoId = req.params.todoId;
+            const { id: userId } = req.user;
+            const { todoId } = req.params;
 
             const deleted = await todosService.deleteTodo(userId, todoId);
 
-            res.send({ deleted: deleted });
+            res.send(deleted);
         } catch (err: Error | unknown) {
             next(err);
         }

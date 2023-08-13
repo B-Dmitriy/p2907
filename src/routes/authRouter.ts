@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, cookie, header, query } from 'express-validator';
+import { body } from 'express-validator';
 import { authController } from '../controllers/authController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { validationMiddleware } from '../middlewares/validationMiddleware';
@@ -7,9 +7,6 @@ import { validationMiddleware } from '../middlewares/validationMiddleware';
 const router = express.Router();
 
 router.get('/me',
-    header('Authorization')
-        .notEmpty().withMessage("Authorization header is required"),
-    validationMiddleware,
     authMiddleware,
     authController.me);
 
@@ -23,10 +20,8 @@ router.post('/login',
     authController.login);
 
 router.get('/logout',
-    header('Authorization')
-        .notEmpty().withMessage("Authorization header is required"),
-    validationMiddleware,
     authMiddleware,
+    validationMiddleware,
     authController.logout);
 
 router.post('/registration',
@@ -40,10 +35,7 @@ router.post('/registration',
     validationMiddleware,
     authController.registration);
 
-router.post('/refresh',
-    cookie('refreshToken').withMessage("refreshToken is required"),
-    query('userId').notEmpty().trim().isInt({ min: 1 }).withMessage("userId is required and must be a positive integer"),
-    validationMiddleware,
+router.get('/refresh',
     authMiddleware,
     authController.logout);
 

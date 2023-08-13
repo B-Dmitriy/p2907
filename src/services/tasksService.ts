@@ -1,9 +1,10 @@
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
 import { Task } from '../models/tasksModels';
+import { ITask } from 'pg-promise';
 
 class TasksService {
-    async getTasks(todoId: string, limit: string, page: string): Promise<Task[] | Error> {
+    async getTasks(todoId: string, limit: string, page: string): Promise<Task[]> {
         try {
             const offset = page === '1' ? 0 : (parseInt(page) * parseInt(limit) - parseInt(limit));
 
@@ -19,7 +20,7 @@ class TasksService {
         }
     }
 
-    async getTasksById(todoId: string, taskId: string): Promise<Task | Error> {
+    async getTasksById(todoId: string, taskId: string): Promise<Task> {
         try {
             const tasks = await db.any(`
                 SELECT * FROM todolist.tasks 
@@ -38,7 +39,7 @@ class TasksService {
         }
     }
 
-    async createTask(todoId: string, title: string, description: string) {
+    async createTask(todoId: string, title: string, description: string): Promise<Task> {
         try {
             const task = await db.any(`
                 INSERT INTO todolist.tasks 
