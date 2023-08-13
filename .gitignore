@@ -6,4 +6,4 @@
 /dist
 
 #enviroment
-/.env
+.env
