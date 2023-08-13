@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
 import { APIError } from '../utils/APIError';
+import type { Request, Response } from 'express';
 
-export function errorsMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
+export function errorsMiddleware(err: Error, _: Request, res: Response) {
     if (err instanceof APIError) {
         return res.status(err.status).send({
             message: err.message,

@@ -1,7 +1,6 @@
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
 import { ITodo } from '../models/todosModels';
-import { errorHandler } from '../utils/errorHandler';
 
 class TodosService {
     async getTodos(userId: string, limit: string, page: string): Promise<ITodo[] | Error> {

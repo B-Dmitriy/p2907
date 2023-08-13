@@ -1,14 +1,13 @@
-import { NextFunction, Response } from 'express';
-import { RequestAuth } from '../middlewares/authMiddleware';
-import { authService } from '../services/authService';
-import { TRegistrationRequest, TLoginRequest } from '../models/authModels';
-import { tokensService } from '../services/tokensService';
 import { APIError } from '../utils/APIError';
+import { authService } from '../services/authService';
+import { tokensService } from '../services/tokensService';
+import type { NextFunction, Response, Request } from 'express';
+import type { TRegistrationRequest, TLoginRequest } from '../models/authModels';
 
 class AuthController {
-    async me(req: RequestAuth, res: Response, next: NextFunction) {
+    async me(req: Request, res: Response, next: NextFunction) {
         try {
-            const id = req.user?.id;
+            const id = req.user.id;
 
             if (!id) throw APIError.NotAuthorized();
 
@@ -40,9 +39,7 @@ class AuthController {
 
     async logout(req: TLoginRequest, res: Response, next: NextFunction) {
         try {
-            /** TODO: Перенести тип в модель User */
-            // @ts-ignore
-            const id = req.user?.id;
+            const id = req.user.id;
 
             if (!id) throw APIError.NotAuthorized();
 

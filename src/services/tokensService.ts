@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
 import { TJWVPayload } from '../models/authModels';
@@ -6,11 +6,11 @@ import { TJWVPayload } from '../models/authModels';
 class TokensService {
     generateTokens(userData: { id: string, roles: number[] }) {
         try {
-            const accessToken = jwt.sign(userData, 'access-secret', {
+            const accessToken = jwt.sign(userData, process.env.JWT_ACCESS_SECRET as Secret, {
                 expiresIn: '30m' // время жизни токена 
             });
 
-            const refreshToken = jwt.sign(userData, 'refresh-secret', {
+            const refreshToken = jwt.sign(userData, process.env.JWT_REFRESH_SECRET as Secret, {
                 expiresIn: '30d' // время жизни токена 
             });
 
@@ -23,7 +23,7 @@ class TokensService {
     verifyAccessToken(token: string): TJWVPayload | null {
         try {
             let userData: TJWVPayload = { id: '', roles: [] };
-            jwt.verify(token, 'access-secret', (err, data) => {
+            jwt.verify(token, process.env.JWT_ACCESS_SECRET as Secret, (err, data) => {
                 if (err !== null) {
                     throw APIError.NotAuthorized(err.message);
                 } else {
@@ -39,7 +39,7 @@ class TokensService {
     verifyRefreshToken(token: string): TJWVPayload | null {
         try {
             let userData: TJWVPayload = { id: '', roles: [] };
-            jwt.verify(token, 'refresh-secret', (err, data) => {
+            jwt.verify(token, process.env.JWT_REFRESH_SECRET as Secret, (err, data) => {
                 if (err !== null) {
                     throw APIError.NotAuthorized(err.message);
                 } else {
