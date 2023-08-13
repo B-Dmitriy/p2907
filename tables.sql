@@ -42,10 +42,10 @@ CREATE TABLE todolist.tasks (
 );
 
 INSERT INTO todolist.roles (name) VALUES ('admin'), ('user'); 
-
+/* users pass: qwerty */
 INSERT INTO todolist.users (login, password, email, phone) VALUES 
-('petr', 'qwerty123', 'petr@mail.ru', '8-800-900-66-33'), 
-('oleg', 'oleg123', 'oleg@mail.ru', '8-800-800-00-21');
+('petr', '$2a$07$K6JFiylYvs5c4IeERLm/YOS/mP4S5wGiwdMpJ7bGp7TTASNfEkM0u', 'petr@mail.ru', '8-800-900-66-33'), 
+('oleg', '$2a$07$K6JFiylYvs5c4IeERLm/YOS/mP4S5wGiwdMpJ7bGp7TTASNfEkM0u', 'oleg@mail.ru', '8-800-800-00-21');
 
 INSERT INTO todolist.todos (user_id, title, description, is_done, deadline) VALUES 
 (1, 'todo1', NULL, FALSE, NULL),

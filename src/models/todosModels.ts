@@ -15,12 +15,14 @@ export type CreateTodoRequest = Request<{}, {}, {
     deadline: string,
 }, {}>
 
-export type UpdateTodoRequest = Request<{}, {
+export type UpdateTodoRequest = Request<{
+    todoId: string;
+}, {}, {
     title: string,
     description: string,
     is_done: boolean,
     deadline: string,
-}, {}, {}>
+}, {}>
 
 export type DeleteTodoRequest = Request<{
     todoId: string;

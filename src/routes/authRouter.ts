@@ -7,7 +7,6 @@ import { validationMiddleware } from '../middlewares/validationMiddleware';
 const router = express.Router();
 
 router.get('/me',
-    validationMiddleware,
     authMiddleware,
     authController.me);
 
@@ -21,8 +20,8 @@ router.post('/login',
     authController.login);
 
 router.get('/logout',
-    validationMiddleware,
     authMiddleware,
+    validationMiddleware,
     authController.logout);
 
 router.post('/registration',

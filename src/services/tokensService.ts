@@ -1,18 +1,31 @@
 import jwt, { Secret } from 'jsonwebtoken';
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
-import { TJWVPayload } from '../models/authModels';
+import type { TJWVPayload, TRequestUser } from '../models/authModels';
+import type {
+    GenerateTokensResult,
+    ISaveTokenResponse,
+    IRefreshTokenResponse
+} from '../models/tokensModels';
 
 class TokensService {
-    generateTokens(userData: { id: string, roles: number[] }) {
+    generateTokens(userData: TRequestUser): GenerateTokensResult {
         try {
-            const accessToken = jwt.sign(userData, process.env.JWT_ACCESS_SECRET as Secret, {
-                expiresIn: '30m' // время жизни токена 
-            });
+            const accessToken = jwt.sign(
+                userData,
+                process.env.JWT_ACCESS_SECRET as Secret,
+                {
+                    expiresIn: '30m'
+                }
+            );
 
-            const refreshToken = jwt.sign(userData, process.env.JWT_REFRESH_SECRET as Secret, {
-                expiresIn: '30d' // время жизни токена 
-            });
+            const refreshToken = jwt.sign(
+                userData,
+                process.env.JWT_REFRESH_SECRET as Secret,
+                {
+                    expiresIn: '30d'
+                }
+            );
 
             return { accessToken, refreshToken };
         } catch (err) {
@@ -23,13 +36,18 @@ class TokensService {
     verifyAccessToken(token: string): TJWVPayload | null {
         try {
             let userData: TJWVPayload = { id: '', roles: [] };
-            jwt.verify(token, process.env.JWT_ACCESS_SECRET as Secret, (err, data) => {
-                if (err !== null) {
-                    throw APIError.NotAuthorized(err.message);
-                } else {
-                    userData = data as TJWVPayload
-                }
-            });
+
+            jwt.verify(
+                token,
+                process.env.JWT_ACCESS_SECRET as Secret,
+                (err, data) => {
+                    if (err !== null) {
+                        throw APIError.NotAuthorized(err.message);
+                    } else {
+                        userData = data as TJWVPayload
+                    }
+                });
+
             return userData;
         } catch (e) {
             return null;
@@ -39,20 +57,25 @@ class TokensService {
     verifyRefreshToken(token: string): TJWVPayload | null {
         try {
             let userData: TJWVPayload = { id: '', roles: [] };
-            jwt.verify(token, process.env.JWT_REFRESH_SECRET as Secret, (err, data) => {
-                if (err !== null) {
-                    throw APIError.NotAuthorized(err.message);
-                } else {
-                    userData = data as TJWVPayload
-                }
-            });
+
+            jwt.verify(
+                token,
+                process.env.JWT_REFRESH_SECRET as Secret,
+                (err, data) => {
+                    if (err !== null) {
+                        throw APIError.NotAuthorized(err.message);
+                    } else {
+                        userData = data as TJWVPayload
+                    }
+                });
+
             return userData;
         } catch (e) {
             return null;
         }
     }
 
-    async saveToken(userId: string, refreshToken: string): Promise<any> {
+    async saveToken(userId: string, refreshToken: string): Promise<ISaveTokenResponse> {
         try {
             const tokens = await db.any(`
                 SELECT * FROM todolist.tokens 
@@ -79,7 +102,7 @@ class TokensService {
         }
     }
 
-    async refreshToken(oldRefreshToken: string) {
+    async refreshToken(oldRefreshToken: string): Promise<IRefreshTokenResponse> {
         try {
             const userData = this.verifyRefreshToken(oldRefreshToken);
 
@@ -109,9 +132,11 @@ class TokensService {
         }
     }
 
-    async deleteRefreshToken(userId: string) {
+    async deleteRefreshToken(userId: string): Promise<void> {
         try {
             await db.any(`DELETE FROM todolist.tokens WHERE user_id = $1;`, userId);
+
+            return Promise.resolve();
         } catch (err) {
             throw APIError.DatabaseError(`Database error: ${err}`);
         }

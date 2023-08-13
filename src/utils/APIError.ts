@@ -12,8 +12,6 @@ class APIError extends Error {
         this.errors = errors || [];
     }
 
-
-
     static BadRequest(message: string, errors: ValidationError[]) {
         return new APIError(400, message, errors);
     }

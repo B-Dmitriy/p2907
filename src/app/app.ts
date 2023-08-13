@@ -6,9 +6,9 @@ import { authRouter } from '../routes/authRouter';
 // import { swaggerConfig } from '../config/swagger';
 import { todosRouter } from '../routes/todosRouter';
 import { tasksRouter } from '../routes/tasksRouter';
+import { authMiddleware } from '../middlewares/authMiddleware';
 import { errorsMiddleware } from '../middlewares/errorsMiddleware';
 import 'dotenv/config';
-import { authMiddleware } from '../middlewares/authMiddleware';
 
 const app = express();
 

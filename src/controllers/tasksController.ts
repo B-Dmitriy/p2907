@@ -59,7 +59,7 @@ class TasksController {
 
             res.send(task);
         } catch (err) {
-            res.status(400).send({ message: 'Bad request' });
+            next(err);
         }
     }
 
