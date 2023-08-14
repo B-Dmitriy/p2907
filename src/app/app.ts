@@ -24,7 +24,7 @@ app.use(coockeyParser());
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/todos', authMiddleware, todosRouter);
-app.use('/api/v1/todos/', authMiddleware, tasksRouter);
+app.use('/api/v1/tasks', authMiddleware, tasksRouter);
 
 app.use(errorsMiddleware);
 

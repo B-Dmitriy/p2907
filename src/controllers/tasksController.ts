@@ -15,8 +15,8 @@ const DEFAULT_PAGE: string = '1';
 class TasksController {
     async getTasks(req: GetTasksRequest, res: Response, next: NextFunction) {
         try {
+            const { userId } = req.query;
             const { todoId } = req.params;
-            const { id: userId } = req.user;
             const { id: tokenUserId } = req.user;
             const { limit = DEFAULT_LIMIT, page = DEFAULT_PAGE } = req.query;
 
@@ -32,8 +32,8 @@ class TasksController {
 
     async getTaskById(req: GetTasksByIdRequest, res: Response, next: NextFunction) {
         try {
+            const { userId } = req.query;
             const { todoId, taskId } = req.params;
-            const { id: userId } = req.user;
             const { id: tokenUserId } = req.user;
 
             if (userId !== tokenUserId) throw APIError.Forbidden();
@@ -90,7 +90,7 @@ class TasksController {
 
             const tasks = await tasksService.deleteTask(todoId, taskId);
 
-            res.send({ deleted: tasks });
+            res.send(tasks[0]);
         } catch (err) {
             next(err);
         }
