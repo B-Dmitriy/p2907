@@ -5,7 +5,7 @@ import { validationMiddleware } from '../middlewares/validationMiddleware';
 
 const router = express.Router();
 
-router.get('/:todoId/tasks',
+router.get('/:todoId',
     param('todoId').notEmpty().trim().isInt({ min: 1 }).withMessage("todoId is required and must be a positive integer"),
     query('userId').notEmpty().trim().isInt({ min: 1 }).withMessage("userId is required and must be a positive integer"),
     query('limit').optional().trim().isInt({ min: 1 }).withMessage("limit must be a positive integer"),
@@ -13,7 +13,7 @@ router.get('/:todoId/tasks',
     validationMiddleware,
     tasksController.getTasks);
 
-router.post('/:todoId/tasks',
+router.post('/:todoId',
     param('todoId').notEmpty().trim().isInt({ min: 1 }).withMessage("todoId is required and must be a positive integer"),
     query('userId').notEmpty().trim().isInt({ min: 1 }).withMessage("userId is required and must be a positive integer"),
     body('title').notEmpty().trim().withMessage("title is required"),
@@ -21,14 +21,14 @@ router.post('/:todoId/tasks',
     validationMiddleware,
     tasksController.createTask);
 
-router.get('/:todoId/tasks/:taskId',
+router.get('/:todoId/task/:taskId',
     param('todoId').notEmpty().trim().isInt({ min: 1 }).withMessage("todoId is required and must be a positive integer"),
     param('taskId').notEmpty().trim().isInt({ min: 1 }).withMessage("taskId is required and must be a positive integer"),
     query('userId').notEmpty().trim().isInt({ min: 1 }).withMessage("userId is required and must be a positive integer"),
     validationMiddleware,
     tasksController.getTaskById);
 
-router.put('/:todoId/tasks/:taskId',
+router.put('/:todoId/task/:taskId',
     param('todoId').notEmpty().trim().isInt({ min: 1 }).withMessage("todoId is required and must be a positive integer"),
     param('taskId').notEmpty().trim().isInt({ min: 1 }).withMessage("taskId is required and must be a positive integer"),
     query('userId').notEmpty().trim().isInt({ min: 1 }).withMessage("userId is required and must be a positive integer"),
@@ -38,7 +38,7 @@ router.put('/:todoId/tasks/:taskId',
     validationMiddleware,
     tasksController.updateTask);
 
-router.delete('/:todoId/tasks/:taskId',
+router.delete('/:todoId/task/:taskId',
     param('todoId').notEmpty().trim().isInt({ min: 1 }).withMessage("todoId is required and must be a positive integer"),
     param('taskId').notEmpty().trim().isInt({ min: 1 }).withMessage("taskId is required and must be a positive integer"),
     query('userId').notEmpty().trim().isInt({ min: 1 }).withMessage("userId is required and must be a positive integer"),

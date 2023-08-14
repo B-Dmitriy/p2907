@@ -12,6 +12,10 @@ export function authMiddleware(req: Request, _: Response, next: NextFunction) {
 
         if (!data) throw APIError.NotAuthorized();
 
+        if (typeof data.id === 'number') {
+            data.id = String(data.id)
+        };
+
         Object.defineProperty(req, 'user', {
             value: data,
             writable: false,
