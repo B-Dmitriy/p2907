@@ -2,6 +2,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
 import type { TJWVPayload, TRequestUser } from '../models/authModels';
+import { JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN } from "../config/constants";
 import type {
     GenerateTokensResult,
     ISaveTokenResponse,
@@ -12,18 +13,24 @@ class TokensService {
     generateTokens(userData: TRequestUser): GenerateTokensResult {
         try {
             const accessToken = jwt.sign(
-                userData,
+                {
+                    id: userData.id,
+                    roles: userData.roles,
+                },
                 process.env.JWT_ACCESS_SECRET as Secret,
                 {
-                    expiresIn: '30m'
+                    expiresIn: JWT_ACCESS_EXPIRES_IN
                 }
             );
 
             const refreshToken = jwt.sign(
-                userData,
+                {
+                    id: userData.id,
+                    roles: userData.roles,
+                },
                 process.env.JWT_REFRESH_SECRET as Secret,
                 {
-                    expiresIn: '30d'
+                    expiresIn: JWT_REFRESH_EXPIRES_IN
                 }
             );
 
@@ -103,6 +110,7 @@ class TokensService {
     }
 
     async refreshToken(oldRefreshToken: string): Promise<IRefreshTokenResponse> {
+        console.log(oldRefreshToken);
         try {
             const userData = this.verifyRefreshToken(oldRefreshToken);
 
