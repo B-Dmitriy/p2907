@@ -1,5 +1,7 @@
+import { APIError } from '../utils/APIError';
 import { tasksService } from '../services/tasksService';
-import type { Response, NextFunction } from "express";
+import type { Response, NextFunction } from 'express';
+import { DEFAULT_LIMIT_TASKS, DEFAULT_PAGE_TASKS } from '../config/constants';
 import type {
     GetTasksRequest,
     GetTasksByIdRequest,
@@ -7,10 +9,6 @@ import type {
     UpdateTaskRequest,
     DeleteTaskRequest,
 } from '../models/tasksModels';
-import { APIError } from '../utils/APIError';
-
-const DEFAULT_LIMIT: string = '5';
-const DEFAULT_PAGE: string = '1';
 
 class TasksController {
     async getTasks(req: GetTasksRequest, res: Response, next: NextFunction) {
@@ -18,7 +16,7 @@ class TasksController {
             const { userId } = req.query;
             const { todoId } = req.params;
             const { id: tokenUserId } = req.user;
-            const { limit = DEFAULT_LIMIT, page = DEFAULT_PAGE } = req.query;
+            const { limit = DEFAULT_LIMIT_TASKS, page = DEFAULT_PAGE_TASKS } = req.query;
 
             if (userId !== tokenUserId) throw APIError.Forbidden();
 

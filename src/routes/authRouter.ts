@@ -37,6 +37,6 @@ router.post('/registration',
 
 router.get('/refresh',
     authMiddleware,
-    authController.logout);
+    authController.refresh);
 
 export const authRouter = router;

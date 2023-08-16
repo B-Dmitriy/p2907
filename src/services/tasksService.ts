@@ -1,7 +1,6 @@
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
 import { Task } from '../models/tasksModels';
-import { ITask } from 'pg-promise';
 
 class TasksService {
     async getTasks(todoId: string, limit: string, page: string): Promise<Task[]> {
@@ -82,7 +81,8 @@ class TasksService {
         try {
             const tasks = await db.any(`
                 DELETE FROM todolist.tasks
-                WHERE todo_id = $1 AND id = $2 RETURNING *;`,
+                WHERE todo_id = $1 AND id = $2 
+                RETURNING *;`,
                 [todoId, taskId]
             );
 
