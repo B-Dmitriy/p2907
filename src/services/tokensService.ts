@@ -12,7 +12,10 @@ class TokensService {
     generateTokens(userData: TRequestUser): GenerateTokensResult {
         try {
             const accessToken = jwt.sign(
-                userData,
+                {
+                    id: userData.id,
+                    roles: userData.roles,
+                },
                 process.env.JWT_ACCESS_SECRET as Secret,
                 {
                     expiresIn: '30m'
@@ -20,7 +23,10 @@ class TokensService {
             );
 
             const refreshToken = jwt.sign(
-                userData,
+                {
+                    id: userData.id,
+                    roles: userData.roles,
+                },
                 process.env.JWT_REFRESH_SECRET as Secret,
                 {
                     expiresIn: '30d'
@@ -103,6 +109,7 @@ class TokensService {
     }
 
     async refreshToken(oldRefreshToken: string): Promise<IRefreshTokenResponse> {
+        console.log(oldRefreshToken);
         try {
             const userData = this.verifyRefreshToken(oldRefreshToken);
 

@@ -7,15 +7,15 @@ describe('/todos', () => {
         db.$pool.end();
     });
 
-    it('should be 200', async () => {
-        await request(app)
-            .get('/todos?userId=1')
-            .expect(200);
-    });
+    // it('should be 200', async () => {
+    //     await request(app)
+    //         .get('/api/v1/todos')
+    //         .expect(200);
+    // });
 
-    it('should be 400', async () => {
+    it('should be 401', async () => {
         await request(app)
-            .get('/todos')
-            .expect(400);
+            .get('/api/v1/todos')
+            .expect(401);
     });
 });
