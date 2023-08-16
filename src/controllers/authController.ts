@@ -1,8 +1,10 @@
 import { APIError } from '../utils/APIError';
 import { authService } from '../services/authService';
 import { tokensService } from '../services/tokensService';
+import { REFRESH_TOKEN_KEY, REFRESH_TOKEN_MAX_AGE } from '../config/constants';
 import type { NextFunction, Response, Request } from 'express';
 import type { TRegistrationRequest, TLoginRequest } from '../models/authModels';
+
 
 class AuthController {
     async me(req: Request, res: Response, next: NextFunction) {
@@ -30,7 +32,7 @@ class AuthController {
             await tokensService.saveToken(user.id, refreshToken);
 
             res
-                .cookie('refreshToken', refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+                .cookie(REFRESH_TOKEN_KEY, refreshToken, { maxAge: REFRESH_TOKEN_MAX_AGE, httpOnly: true })
                 .send({ user, accessToken });
         } catch (err: Error | unknown) {
             next(err);
@@ -46,7 +48,7 @@ class AuthController {
             await tokensService.deleteRefreshToken(id);
 
             res
-                .clearCookie('refreshToken')
+                .clearCookie(REFRESH_TOKEN_KEY)
                 .status(204).send();
         } catch (err: Error | unknown) {
             next(err);
@@ -67,7 +69,7 @@ class AuthController {
 
             res
                 .status(201)
-                .cookie('refreshToken', refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+                .cookie(REFRESH_TOKEN_KEY, refreshToken, { maxAge: REFRESH_TOKEN_MAX_AGE, httpOnly: true })
                 .send({ user, accessToken });
         } catch (err: Error | unknown) {
             next(err);
@@ -84,7 +86,7 @@ class AuthController {
 
             res
                 .status(201)
-                .cookie('refreshToken', newRefreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
+                .cookie(REFRESH_TOKEN_KEY, newRefreshToken, { maxAge: REFRESH_TOKEN_MAX_AGE, httpOnly: true })
                 .send({ user, accessToken });
         } catch (err: Error | unknown) {
             next(err);

@@ -1,5 +1,6 @@
 import { todosService } from '../services/todosService';
 import type { NextFunction, Response } from 'express';
+import { DEFAULT_LIMIT_TODOS, DEFAULT_PAGE_TODOS } from '../config/constants';
 import type {
     GetTodosRequest,
     GetTodoByIdRequest,
@@ -8,14 +9,11 @@ import type {
     DeleteTodoRequest,
 } from '../models/todosModels';
 
-const DEFAULT_LIMIT: string = '10';
-const DEFAULT_PAGE: string = '1';
-
 class TodoController {
     async getTodos(req: GetTodosRequest, res: Response, next: NextFunction) {
         try {
             const { id: userId } = req.user;
-            const { limit = DEFAULT_LIMIT, page = DEFAULT_PAGE } = req.query;
+            const { limit = DEFAULT_LIMIT_TODOS, page = DEFAULT_PAGE_TODOS } = req.query;
 
             const data = await todosService.getTodos(userId, limit, page);
 

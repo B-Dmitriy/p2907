@@ -2,6 +2,7 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { db } from '../config/database';
 import { APIError } from '../utils/APIError';
 import type { TJWVPayload, TRequestUser } from '../models/authModels';
+import { JWT_ACCESS_EXPIRES_IN, JWT_REFRESH_EXPIRES_IN } from "../config/constants";
 import type {
     GenerateTokensResult,
     ISaveTokenResponse,
@@ -18,7 +19,7 @@ class TokensService {
                 },
                 process.env.JWT_ACCESS_SECRET as Secret,
                 {
-                    expiresIn: '30m'
+                    expiresIn: JWT_ACCESS_EXPIRES_IN
                 }
             );
 
@@ -29,7 +30,7 @@ class TokensService {
                 },
                 process.env.JWT_REFRESH_SECRET as Secret,
                 {
-                    expiresIn: '30d'
+                    expiresIn: JWT_REFRESH_EXPIRES_IN
                 }
             );
 
