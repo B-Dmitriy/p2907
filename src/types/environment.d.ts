@@ -12,6 +12,11 @@ declare global {
             DATABASE_NAME: string;
             DATABASE_USER: string;
             DATABASE_PASS: string;
+            MAIL_HOST: string;
+            MAIL_PORT: string;
+            MAIL_USER: string;
+            MAIL_PASS: string;
+            MAIL_REDIRECT: string;
         }
     }
 }

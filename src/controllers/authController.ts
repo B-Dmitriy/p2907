@@ -3,8 +3,7 @@ import { authService } from '../services/authService';
 import { tokensService } from '../services/tokensService';
 import { REFRESH_TOKEN_KEY, REFRESH_TOKEN_MAX_AGE } from '../config/constants';
 import type { NextFunction, Response, Request } from 'express';
-import type { TRegistrationRequest, TLoginRequest } from '../models/authModels';
-
+import type { TRegistrationRequest, TLoginRequest, TActivateRequest } from '../models/authModels';
 
 class AuthController {
     async me(req: Request, res: Response, next: NextFunction) {
@@ -45,7 +44,7 @@ class AuthController {
 
             if (!id) throw APIError.NotAuthorized();
 
-            await tokensService.deleteRefreshToken(id);
+            await authService.logout(id);
 
             res
                 .clearCookie(REFRESH_TOKEN_KEY)
@@ -76,6 +75,7 @@ class AuthController {
         }
     }
 
+    /** TODO: any... */
     async refresh(req: any, res: Response, next: NextFunction) {
         try {
             const { refreshToken } = req.cookies;
@@ -88,6 +88,22 @@ class AuthController {
                 .status(201)
                 .cookie(REFRESH_TOKEN_KEY, newRefreshToken, { maxAge: REFRESH_TOKEN_MAX_AGE, httpOnly: true })
                 .send({ user, accessToken });
+        } catch (err: Error | unknown) {
+            next(err);
+        }
+    }
+
+    async activate(req: TActivateRequest, res: Response, next: NextFunction) {
+        try {
+            const { link } = req.params;
+
+            if (!link) throw APIError.BadRequest('User link is required', []);
+
+            await authService.activate(link);
+
+            res
+                .status(301)
+                .redirect(process.env.MAIL_REDIRECT)
         } catch (err: Error | unknown) {
             next(err);
         }
