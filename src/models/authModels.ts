@@ -6,6 +6,7 @@ export interface IPublicUserData {
     email: string;
     confirmed: boolean;
     roles: number[];
+    user_link: string;
 }
 
 export interface IPrivateUserData {
@@ -22,3 +23,4 @@ export type TRegistrationUserData = Omit<IUser, 'id' | 'confirmed' | 'roles'>;
 
 export type TRegistrationRequest = Request<{}, {}, TRegistrationUserData>;
 export type TLoginRequest = Request<{}, {}, TLoginData>;
+export type TActivateRequest = Request<{ link: string }>;

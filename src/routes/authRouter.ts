@@ -39,4 +39,7 @@ router.get('/refresh',
     authMiddleware,
     authController.refresh);
 
+router.get('/activate/:link',
+    authController.activate);
+
 export const authRouter = router;

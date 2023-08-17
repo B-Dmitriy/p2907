@@ -1,8 +1,10 @@
+import {v4} from 'uuid';
 import bcrypt from 'bcryptjs';
-import { db } from '../config/database';
-import { APIError } from '../utils/APIError';
-import { tokensService } from './tokensService';
-import type { IPublicUserData, TRegistrationUserData } from '../models/authModels';
+import {db} from '../config/database';
+import {APIError} from '../utils/APIError';
+import {tokensService} from './tokensService';
+import type {IPublicUserData, TRegistrationUserData} from '../models/authModels';
+import {mailService} from "./mailService";
 
 class AuthService {
     async me(id: string): Promise<IPublicUserData> {
@@ -21,6 +23,7 @@ class AuthService {
                 email: user.email,
                 confirmed: user.confirmed,
                 roles: user.roles,
+                user_link: user.user_link,
             };
         } catch (err) {
             if (err instanceof APIError) {
@@ -43,14 +46,16 @@ class AuthService {
 
             if (!bcrypt.compareSync(password, user.password)) {
                 throw APIError.Conflict("Wrong login details");
-            };
+            }
+            ;
 
             return {
                 id: user.id,
                 login: user.login,
                 email: user.email,
                 confirmed: user.confirmed,
-                roles: user.roles
+                roles: user.roles,
+                user_link: user.user_link,
             };
         } catch (err) {
             if (err instanceof APIError) {
@@ -69,10 +74,11 @@ class AuthService {
         }
     }
 
-    async registration({ login, password, email, phone_number }: TRegistrationUserData): Promise<IPublicUserData> {
+    async registration({login, password, email, phone_number}: TRegistrationUserData): Promise<IPublicUserData> {
         try {
             const salt = bcrypt.genSaltSync(7);
             const hashPassword = bcrypt.hashSync(password, salt);
+            const userLink = v4();
 
             const users = await db.any(`
                 SELECT * FROM todolist.users 
@@ -82,13 +88,14 @@ class AuthService {
 
             const data = await db.any(`
                 INSERT INTO todolist.users
-                (login, password, email, phone)
-                VALUES ($1, $2, $3, $4) 
+                (login, password, email, phone, user_link)
+                VALUES ($1, $2, $3, $4, $5) 
                 RETURNING *;`,
-                [login, hashPassword, email, phone_number]);
-
+                [login, hashPassword, email, phone_number, userLink]);
 
             const newUser: IPublicUserData = data[0];
+
+            await mailService.sendActivateMail(newUser.email, userLink);
 
             return {
                 id: newUser.id,
@@ -96,11 +103,26 @@ class AuthService {
                 email: newUser.email,
                 confirmed: newUser.confirmed,
                 roles: newUser.roles,
+                user_link: newUser.user_link,
             }
         } catch (err) {
             if (err instanceof APIError) {
                 throw err;
             }
+            throw APIError.DatabaseError(`[Database error] ${err}`);
+        }
+    }
+
+    async activate(activateLink: string): Promise<void> {
+        try {
+            await db.any(`
+                UPDATE todolist.users 
+                SET confirmed = TRUE
+                WHERE user_link = $1
+                RETURNING *;`,
+                activateLink);
+
+        } catch (err) {
             throw APIError.DatabaseError(`[Database error] ${err}`);
         }
     }

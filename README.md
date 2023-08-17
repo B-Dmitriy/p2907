@@ -2,6 +2,7 @@
 ### Required dotenv variables
 
 ***App***
+* URL: string
 * PORT: number
 
 ***Secrets***
@@ -14,3 +15,10 @@
 * DATABASE_NAME: string
 * DATABASE_USER: string
 * DATABASE_PASS: string
+
+***Mail connection***
+* MAIL_HOST: string
+* MAIL_PORT: number
+* MAIL_USER: string
+* MAIL_PASS: string
+* MAIL_REDIRECT: string
