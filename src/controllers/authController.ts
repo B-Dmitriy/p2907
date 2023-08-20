@@ -6,13 +6,13 @@ import type { NextFunction, Response, Request } from 'express';
 import type { TRegistrationRequest, TLoginRequest, TActivateRequest } from '../models/authModels';
 
 class AuthController {
-    async me(req: Request, res: Response, next: NextFunction) {
+    async me (req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const id = req.user.id;
 
             if (!id) throw APIError.NotAuthorized();
 
-            const data = await authService.me(id as string);
+            const data = await authService.me(id);
 
             res.send(data);
         } catch (err: Error | unknown) {
@@ -20,7 +20,7 @@ class AuthController {
         }
     }
 
-    async login(req: TLoginRequest, res: Response, next: NextFunction) {
+    async login (req: TLoginRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { login, password } = req.body;
 
@@ -38,7 +38,7 @@ class AuthController {
         }
     }
 
-    async logout(req: TLoginRequest, res: Response, next: NextFunction) {
+    async logout (req: TLoginRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const id = req.user.id;
 
@@ -54,7 +54,7 @@ class AuthController {
         }
     }
 
-    async registration(req: TRegistrationRequest, res: Response, next: NextFunction) {
+    async registration (req: TRegistrationRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const userData = req.body;
 
@@ -76,7 +76,7 @@ class AuthController {
     }
 
     /** TODO: any... */
-    async refresh(req: any, res: Response, next: NextFunction) {
+    async refresh (req: any, res: Response, next: NextFunction): Promise<void> {
         try {
             const { refreshToken } = req.cookies;
 
@@ -93,7 +93,7 @@ class AuthController {
         }
     }
 
-    async activate(req: TActivateRequest, res: Response, next: NextFunction) {
+    async activate (req: TActivateRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { link } = req.params;
 
@@ -103,7 +103,7 @@ class AuthController {
 
             res
                 .status(301)
-                .redirect(process.env.MAIL_REDIRECT)
+                .redirect(process.env.MAIL_REDIRECT);
         } catch (err: Error | unknown) {
             next(err);
         }

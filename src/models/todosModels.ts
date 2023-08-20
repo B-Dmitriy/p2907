@@ -1,35 +1,35 @@
 import type { Request } from 'express';
 
-export type GetTodosRequest = Request<{}, {}, {}, {
-    limit: string,
-    page: string,
-}>
+export type GetTodosRequest = Request<any, any, any, {
+    limit: string
+    page: string
+}>;
 
 export type GetTodoByIdRequest = Request<{
-    todoId: string;
-}, {}, {}, {}>
+    todoId: string
+}, any, any, any>;
 
-export type CreateTodoRequest = Request<{}, {}, {
-    title: string,
-    description: string,
-    deadline: string,
-}, {}>
+export type CreateTodoRequest = Request<any, any, {
+    title: string
+    description: string
+    deadline: string
+}, any>;
 
 export type UpdateTodoRequest = Request<{
-    todoId: string;
-}, {}, {
-    title: string,
-    description: string,
-    is_done: boolean,
-    deadline: string,
-}, {}>
+    todoId: string
+}, any, {
+    title: string
+    description: string
+    isDone: boolean
+    deadline: string
+}, any>;
 
 export type DeleteTodoRequest = Request<{
-    todoId: string;
-}, {}, {}, {}>
+    todoId: string
+}, any, any, any>;
 
 export interface ITodo {
-    id: string;
-    title: string;
-    is_done: boolean;
+    id: string
+    title: string
+    isDone: boolean
 }

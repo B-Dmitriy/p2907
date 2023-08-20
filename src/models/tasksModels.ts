@@ -1,51 +1,51 @@
 import { Request } from 'express';
 
 export interface Task {
-    id: number;
-    todo_id: number;
-    title: string;
-    description: string | null;
-    is_done: boolean;
+    id: number
+    todo_id: number
+    title: string
+    description: string | null
+    is_done: boolean
 }
 
 export type GetTasksRequest = Request<{
-    todoId: string;
-}, {}, {}, {
-    userId: string;
-    limit: string;
-    page: string;
-}>
+    todoId: string
+}, any, any, {
+    userId: string
+    limit: string
+    page: string
+}>;
 
 export type GetTasksByIdRequest = Request<{
-    todoId: string;
-    taskId: string;
-}, {}, {}, {
-    userId: string;
-}>
+    todoId: string
+    taskId: string
+}, any, any, {
+    userId: string
+}>;
 
 export type CreateTaskRequest = Request<{
-    todoId: string;
-}, {}, {
-    title: string;
-    description: string;
+    todoId: string
+}, any, {
+    title: string
+    description: string
 }, {
-    userId: string;
-}>
+    userId: string
+}>;
 
 export type UpdateTaskRequest = Request<{
-    todoId: string;
-    taskId: string;
-}, {}, {
-    title: string;
-    description: string;
-    isDone: boolean;
+    todoId: string
+    taskId: string
+}, any, {
+    title: string
+    description: string
+    isDone: boolean
 }, {
-    userId: string;
-}>
+    userId: string
+}>;
 
 export type DeleteTaskRequest = Request<{
-    todoId: string;
-    taskId: string;
-}, {}, {}, {
-    userId: string;
-}>
+    todoId: string
+    taskId: string
+}, any, any, {
+    userId: string
+}>;

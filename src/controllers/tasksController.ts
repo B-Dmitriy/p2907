@@ -7,11 +7,11 @@ import type {
     GetTasksByIdRequest,
     CreateTaskRequest,
     UpdateTaskRequest,
-    DeleteTaskRequest,
+    DeleteTaskRequest
 } from '../models/tasksModels';
 
 class TasksController {
-    async getTasks(req: GetTasksRequest, res: Response, next: NextFunction) {
+    async getTasks (req: GetTasksRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { userId } = req.query;
             const { todoId } = req.params;
@@ -28,7 +28,7 @@ class TasksController {
         }
     }
 
-    async getTaskById(req: GetTasksByIdRequest, res: Response, next: NextFunction) {
+    async getTaskById (req: GetTasksByIdRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { userId } = req.query;
             const { todoId, taskId } = req.params;
@@ -44,7 +44,7 @@ class TasksController {
         }
     }
 
-    async createTask(req: CreateTaskRequest, res: Response, next: NextFunction) {
+    async createTask (req: CreateTaskRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { todoId } = req.params;
             const { userId } = req.query;
@@ -61,7 +61,7 @@ class TasksController {
         }
     }
 
-    async updateTask(req: UpdateTaskRequest, res: Response, next: NextFunction) {
+    async updateTask (req: UpdateTaskRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { todoId, taskId } = req.params;
             const { userId } = req.query;
@@ -78,7 +78,7 @@ class TasksController {
         }
     }
 
-    async deleteTask(req: DeleteTaskRequest, res: Response, next: NextFunction) {
+    async deleteTask (req: DeleteTaskRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { todoId, taskId } = req.params;
             const { userId } = req.query;

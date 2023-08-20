@@ -1,21 +1,21 @@
-import {v4} from 'uuid';
+import { v4 } from 'uuid';
 import bcrypt from 'bcryptjs';
-import {db} from '../config/database';
-import {APIError} from '../utils/APIError';
-import {tokensService} from './tokensService';
-import type {IPublicUserData, TRegistrationUserData} from '../models/authModels';
-import {mailService} from "./mailService";
+import { db } from '../config/database';
+import { APIError } from '../utils/APIError';
+import { tokensService } from './tokensService';
+import type { IPublicUserData, TRegistrationUserData } from '../models/authModels';
+import { mailService } from './mailService';
 
 class AuthService {
-    async me(id: string): Promise<IPublicUserData> {
+    async me (id: string): Promise<IPublicUserData> {
         try {
             const users = await db.any(`
                 SELECT * FROM todolist.users 
                 WHERE id = $1;`, id);
 
-            if (!users.length) throw APIError.NotFound(`Me data not found`);
+            if (users.length === 0) throw APIError.NotFound('Me data not found');
 
-            const user: IPublicUserData = users[0];
+            const user = users[0];
 
             return {
                 id: user.id,
@@ -23,29 +23,29 @@ class AuthService {
                 email: user.email,
                 confirmed: user.confirmed,
                 roles: user.roles,
-                user_link: user.user_link,
+                userLink: user.user_link
             };
         } catch (err) {
             if (err instanceof APIError) {
                 throw err;
             }
-            throw APIError.DatabaseError(`[Database error] ${err}`);
+            throw APIError.DatabaseError();
         }
     }
 
-    async login(login: string, password: string): Promise<IPublicUserData> {
+    async login (login: string, password: string): Promise<IPublicUserData> {
         try {
             const users = await db.any(`
                 SELECT * FROM todolist.users 
                 WHERE login = $1;`,
-                login);
+            login);
 
-            if (!users.length) throw APIError.Conflict('Wrong login details');
+            if (users.length === 0) throw APIError.Conflict('Wrong login details');
 
             const user = users[0];
 
             if (!bcrypt.compareSync(password, user.password)) {
-                throw APIError.Conflict("Wrong login details");
+                throw APIError.Conflict('Wrong login details');
             }
             ;
 
@@ -55,26 +55,25 @@ class AuthService {
                 email: user.email,
                 confirmed: user.confirmed,
                 roles: user.roles,
-                user_link: user.user_link,
+                userLink: user.user_link
             };
         } catch (err) {
             if (err instanceof APIError) {
                 throw err;
             }
-            throw APIError.DatabaseError(`[Database error] ${err}`);
+            throw APIError.DatabaseError();
         }
-
     }
 
-    async logout(userId: string): Promise<void> {
+    async logout (userId: string): Promise<void> {
         try {
             await tokensService.deleteRefreshToken(userId);
         } catch (err) {
-            throw APIError.DatabaseError(`[Database error] ${err}`);
+            throw APIError.DatabaseError();
         }
     }
 
-    async registration({login, password, email, phone_number}: TRegistrationUserData): Promise<IPublicUserData> {
+    async registration ({ login, password, email, phoneNumber }: TRegistrationUserData): Promise<IPublicUserData> {
         try {
             const salt = bcrypt.genSaltSync(7);
             const hashPassword = bcrypt.hashSync(password, salt);
@@ -84,16 +83,16 @@ class AuthService {
                 SELECT * FROM todolist.users 
                 WHERE login = $1 OR email = $2;`, [login, email]);
 
-            if (users.length) throw APIError.Conflict(`User with login: ${login} or email: ${email} already existing`);
+            if (users.length > 0) throw APIError.Conflict(`User with login: ${login} or email: ${email} already existing`);
 
             const data = await db.any(`
                 INSERT INTO todolist.users
                 (login, password, email, phone, user_link)
                 VALUES ($1, $2, $3, $4, $5) 
                 RETURNING *;`,
-                [login, hashPassword, email, phone_number, userLink]);
+            [login, hashPassword, email, phoneNumber, userLink]);
 
-            const newUser: IPublicUserData = data[0];
+            const newUser = data[0];
 
             await mailService.sendActivateMail(newUser.email, userLink);
 
@@ -103,27 +102,26 @@ class AuthService {
                 email: newUser.email,
                 confirmed: newUser.confirmed,
                 roles: newUser.roles,
-                user_link: newUser.user_link,
-            }
+                userLink: newUser.user_link
+            };
         } catch (err) {
             if (err instanceof APIError) {
                 throw err;
             }
-            throw APIError.DatabaseError(`[Database error] ${err}`);
+            throw APIError.DatabaseError();
         }
     }
 
-    async activate(activateLink: string): Promise<void> {
+    async activate (activateLink: string): Promise<void> {
         try {
             await db.any(`
                 UPDATE todolist.users 
                 SET confirmed = TRUE
                 WHERE user_link = $1
                 RETURNING *;`,
-                activateLink);
-
+            activateLink);
         } catch (err) {
-            throw APIError.DatabaseError(`[Database error] ${err}`);
+            throw APIError.DatabaseError();
         }
     }
 }
