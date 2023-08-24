@@ -28,8 +28,13 @@ export type DeleteTodoRequest = Request<{
     todoId: string
 }, any, any, any>;
 
-export interface ITodo {
-    id: string
+export interface Todo {
+    id: number
+    user_id: number
     title: string
-    isDone: boolean
+    description: string | null
+    is_done: boolean
+    deadline: Date | null
+    created_at: Date
+    updated_at: Date | null
 }
