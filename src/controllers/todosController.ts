@@ -6,11 +6,11 @@ import type {
     GetTodoByIdRequest,
     CreateTodoRequest,
     UpdateTodoRequest,
-    DeleteTodoRequest,
+    DeleteTodoRequest
 } from '../models/todosModels';
 
 class TodoController {
-    async getTodos(req: GetTodosRequest, res: Response, next: NextFunction) {
+    async getTodos (req: GetTodosRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: userId } = req.user;
             const { limit = DEFAULT_LIMIT_TODOS, page = DEFAULT_PAGE_TODOS } = req.query;
@@ -23,7 +23,7 @@ class TodoController {
         }
     }
 
-    async getTodoById(req: GetTodoByIdRequest, res: Response, next: NextFunction) {
+    async getTodoById (req: GetTodoByIdRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: userId } = req.user;
             const { todoId } = req.params;
@@ -36,7 +36,7 @@ class TodoController {
         }
     }
 
-    async createTodo(req: CreateTodoRequest, res: Response, next: NextFunction) {
+    async createTodo (req: CreateTodoRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: userId } = req.user;
             const { title, description, deadline } = req.body;
@@ -49,13 +49,13 @@ class TodoController {
         }
     }
 
-    async updateTodo(req: UpdateTodoRequest, res: Response, next: NextFunction) {
+    async updateTodo (req: UpdateTodoRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: userId } = req.user;
             const { todoId } = req.params;
-            const { title, description, is_done, deadline } = req.body;
+            const { title, description, isDone, deadline } = req.body;
 
-            const data = await todosService.updateTodo(userId, todoId, title, description, is_done, deadline);
+            const data = await todosService.updateTodo(userId, todoId, title, description, isDone, deadline);
 
             res.send(data);
         } catch (err: Error | unknown) {
@@ -63,7 +63,7 @@ class TodoController {
         }
     }
 
-    async deleteTodo(req: DeleteTodoRequest, res: Response, next: NextFunction) {
+    async deleteTodo (req: DeleteTodoRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: userId } = req.user;
             const { todoId } = req.params;

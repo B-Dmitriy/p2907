@@ -1,5 +1,5 @@
 class Validator {
-    isNullOrISO(value: string | null): boolean {
+    isNullOrISO (value: string | null): boolean {
         if (typeof value === 'string') {
             if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(value)) return false;
             const d = new Date(value);

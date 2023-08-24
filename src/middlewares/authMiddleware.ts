@@ -2,7 +2,7 @@ import { APIError } from '../utils/APIError';
 import { tokensService } from '../services/tokensService';
 import type { Request, Response, NextFunction } from 'express';
 
-export function authMiddleware(req: Request, _: Response, next: NextFunction) {
+export function authMiddleware (req: Request, _: Response, next: NextFunction): void {
     try {
         const token = req.headers.authorization?.split(' ')[1];
 
@@ -13,12 +13,12 @@ export function authMiddleware(req: Request, _: Response, next: NextFunction) {
         if (!data) throw APIError.NotAuthorized();
 
         if (typeof data.id === 'number') {
-            data.id = String(data.id)
+            data.id = String(data.id);
         };
 
         Object.defineProperty(req, 'user', {
             value: data,
-            writable: false,
+            writable: false
         });
 
         next();

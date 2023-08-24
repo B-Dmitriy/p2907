@@ -1,17 +1,17 @@
-import { Request } from "express";
+import { Request } from 'express';
 
 export interface IPublicUserData {
-    id: string;
-    login: string;
-    email: string;
-    confirmed: boolean;
-    roles: number[];
-    user_link: string;
+    id: string
+    login: string
+    email: string
+    confirmed: boolean
+    roles: number[]
+    userLink: string
 }
 
 export interface IPrivateUserData {
-    password: string;
-    phone_number: string | null;
+    password: string
+    phoneNumber: string | null
 }
 
 export interface IUser extends IPublicUserData, IPrivateUserData { }
@@ -21,6 +21,6 @@ export type TRequestUser = Pick<IUser, 'id' | 'roles'>;
 export type TJWVPayload = TRequestUser;
 export type TRegistrationUserData = Omit<IUser, 'id' | 'confirmed' | 'roles'>;
 
-export type TRegistrationRequest = Request<{}, {}, TRegistrationUserData>;
-export type TLoginRequest = Request<{}, {}, TLoginData>;
+export type TRegistrationRequest = Request<any, any, TRegistrationUserData>;
+export type TLoginRequest = Request<any, any, TLoginData>;
 export type TActivateRequest = Request<{ link: string }>;
