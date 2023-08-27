@@ -76,7 +76,7 @@ class AuthController {
     }
 
     /** TODO: any... */
-    async refresh (req: any, res: Response, next: NextFunction): Promise<void> {
+    async refresh (req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { refreshToken } = req.cookies;
 

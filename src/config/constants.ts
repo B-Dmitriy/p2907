@@ -1,7 +1,7 @@
 /** Auth */
 export const REFRESH_TOKEN_KEY = 'refreshToken';
 export const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
-export const JWT_ACCESS_EXPIRES_IN = '30m';
+export const JWT_ACCESS_EXPIRES_IN = '1m';
 export const JWT_REFRESH_EXPIRES_IN = '30d';
 
 /** Todos */
