@@ -36,7 +36,6 @@ router.post('/registration',
     authController.registration);
 
 router.get('/refresh',
-    authMiddleware,
     authController.refresh);
 
 router.get('/activate/:link',

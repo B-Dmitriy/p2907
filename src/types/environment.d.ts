@@ -3,6 +3,9 @@ export { };
 declare global {
     namespace NodeJS {
         interface ProcessEnv {
+            URL: string
+            PORT: string
+            FRONTEND_URL: string
             JWT_ACCESS_SECRET: string
             JWT_REFRESH_SECRET: string
             DATABASE_HOST: string
