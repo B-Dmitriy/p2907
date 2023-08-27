@@ -110,7 +110,6 @@ class TokensService {
     }
 
     async refreshToken (oldRefreshToken: string): Promise<IRefreshTokenResponse> {
-        console.log(oldRefreshToken);
         try {
             const userData = this.verifyRefreshToken(oldRefreshToken);
 
