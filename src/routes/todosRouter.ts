@@ -9,6 +9,7 @@ const router = express.Router();
 router.get('/',
     query('limit').optional().trim().isInt({ min: 1 }).withMessage('limit must be a positive integer'),
     query('page').optional().trim().isInt({ min: 1 }).withMessage('page must be a positive integer'),
+    query('isDone').optional().trim().isBoolean().withMessage('page must be boolean'),
     validationMiddleware,
     todoController.getTodos);
 
