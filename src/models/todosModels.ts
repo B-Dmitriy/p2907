@@ -3,6 +3,7 @@ import type { Request } from 'express';
 export type GetTodosRequest = Request<any, any, any, {
     limit: string
     page: string
+    isDone?: string
 }>;
 
 export type GetTodoByIdRequest = Request<{

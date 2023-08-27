@@ -3,17 +3,27 @@ import { APIError } from '../utils/APIError';
 import { Todo } from '../models/todosModels';
 
 class TodosService {
-    async getTodos (userId: string, limit: string, page: string): Promise<Todo[]> {
+    async getTodos (userId: string, limit: string, page: string, isDone?: boolean): Promise<Todo[]> {
         try {
             const offset = page === '1' ? 0 : (parseInt(page) * parseInt(limit) - parseInt(limit));
 
-            const data = await db.any(`
-                SELECT * FROM todolist.todos 
-                WHERE user_id = $1 
-                LIMIT $2 OFFSET $3`,
-            [userId, limit, offset]);
+            if (typeof isDone === 'boolean') {
+                const data = await db.any(`
+                    SELECT * FROM todolist.todos 
+                    WHERE user_id = $1 AND is_done = $2 
+                    LIMIT $3 OFFSET $4`,
+                [userId, isDone, limit, offset]);
 
-            return data;
+                return data;
+            } else {
+                const data = await db.any(`
+                    SELECT * FROM todolist.todos 
+                    WHERE user_id = $1 
+                    LIMIT $2 OFFSET $3`,
+                [userId, limit, offset]);
+
+                return data;
+            }
         } catch (err) {
             throw APIError.DatabaseError();
         }

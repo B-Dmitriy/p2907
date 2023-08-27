@@ -13,9 +13,17 @@ class TodoController {
     async getTodos (req: GetTodosRequest, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id: userId } = req.user;
-            const { limit = DEFAULT_LIMIT_TODOS, page = DEFAULT_PAGE_TODOS } = req.query;
+            const { limit = DEFAULT_LIMIT_TODOS, page = DEFAULT_PAGE_TODOS, isDone } = req.query;
 
-            const data = await todosService.getTodos(userId, limit, page);
+            let isDoneForService: undefined | boolean;
+            if (typeof isDone !== 'undefined' && isDone === 'true') {
+                isDoneForService = true;
+            }
+            if (typeof isDone !== 'undefined' && isDone === 'false') {
+                isDoneForService = false;
+            }
+
+            const data = await todosService.getTodos(userId, limit, page, isDoneForService);
 
             res.send(data);
         } catch (err: Error | unknown) {
